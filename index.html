@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>molecule editor</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" type="image/jpg" href="./icons/cyclopentadiene.png"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            
+            <a id="logo" class="navbar-brand" href="#">
+                <img src="./icons/logo-2.jpg" alt="" srcset="">
+            </a>
+            <!-- 
+            <a class="navbar-brand" href="#">Navbar</a> -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            New
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><button class="dropdown-item">New Document (open new tab)</button></li>
+                            <li><button class="dropdown-item">New Document (open in current tab)</button></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Document
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><button class="dropdown-item">Clear</button></li>
+                            <li><button class="dropdown-item">Is Blank</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item">Open</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item">Save</button></li>
+                            <li><button class="dropdown-item">Save As</button></li> 
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Edit
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><button class="dropdown-item">Undo</button></li>
+                            <li><button class="dropdown-item">Redo</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item">Copy</button></li>
+                            <li><button class="dropdown-item">Paste</button></li>
+                            <li><button class="dropdown-item">Cut</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item">Select All</button></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Object
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><button class="dropdown-item">Align Left</button></li>
+                            <li><button class="dropdown-item">Align Right</button></li>
+                            <li><button class="dropdown-item">Align Center</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item">Rotate Left</button></li>
+                            <li><button class="dropdown-item">Rotate Right</button></li>
+                            <li><button class="dropdown-item">Rotate 180°</button></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main">
+        <div class="toolbar">
+            <button class="tool"><img src="./icons/bonds/bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/bold-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/dashed-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/double-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/hashed-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/hashed-wedged-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/hollow-bond.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/bonds/wedged-bond.png" alt="" srcset=""></button>
+    
+            <button class="tool"><img src="./icons/structures/benzene-2.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/structures/butane.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/structures/cyclopentadiene.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/structures/hexane.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/structures/propane.png" alt="" srcset=""></button>
+    
+            <button class="tool"><img src="./icons/others/plus.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/others/circle-plus.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/others/minus.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/others/circle-plus.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/others/arrow.png" alt="" srcset=""></button>
+            <button class="tool"><img src="./icons/others/eraser.png" alt="" srcset=""></button>
+        </div>
+
+    
+        <canvas id="canvas"></canvas>
+        
+    </div>
+
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/fabric.min.js"></script>
+    <!-- <script src="./js/main.js"></script> -->
+    <script src="./js/app.js"></script>
+</body>
+</html>
