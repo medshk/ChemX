@@ -70,7 +70,7 @@ button.tool {
     position: relative;
 }
 
-button.tool:hover{
+button.tool:hover, button.tool.active{
     background-color: #a6bbdb7a;
 }
 

@@ -53,6 +53,8 @@ class Polygone{
                 this.drawSimplePolygone()
                 break;
         }
+
+        this.addSquare()
         
     }
 
@@ -234,6 +236,7 @@ class Polygone{
         });
     }
    
+    //get the centroid coordinate of the polygone
     getPolygCentroid(pts){
         let first = pts[0], last = pts[pts.length-1];
         if (first.left != last.left || first.top != last.top) pts.push(first);
@@ -252,6 +255,7 @@ class Polygone{
         return { x:x/f, y:y/f };
     }
 
+    //add circles on corners
     addCircles(polygone){
         let matrix = polygone.calcTransformMatrix();
         let transformedPoints = polygone.get("points")
@@ -272,6 +276,40 @@ class Polygone{
     //polygon.canvas.remove(...polygon.canvas.getObjects('circle')).add.apply(polygon.canvas, circles).setActiveObject(polygon).renderAll();
 
     return circles;
+    }
+
+    //add squares on sides
+    addSquare(){
+        this.lines.forEach(line => {
+            const point1 = {x: line.x1, y:line.y1}
+            const point2 = {x: line.x2, y:line.y2}
+            const midpoint = {x: (point1.x + point2.x)/2,
+                            y: (point1.y + point2.y)/2, 
+                            angle: Canvas.getPointFromOrigin(point1, point2, 4).angle
+                            } 
+            const square = new fabric.Rect({
+                line: line,
+                type: 'side',
+                originCenter: this.element.center,
+                width: 8, 
+                height: 28, 
+                left: midpoint.x + 0.5, 
+                top: midpoint.y + 0.5,
+                rx: '5',
+                ry: '5',
+                fill: ' #56519f00',
+                strokeWidth : 2,
+                originX: 'center',
+                originY: 'center',
+                angle: midpoint.angle,
+                hasControls: false,
+                hasBorders: false,
+                selectable: false
+            });
+
+            canvas.add(square).requestRenderAll();
+            return square;
+        })
     }
 
     static draw2(circle, type, radius){
@@ -332,17 +370,6 @@ class Atom{
             selectable: false
         });
     }
-
-    //set circle border color to blue on hover
-    static setBorderColor(circle, color = "blue"){
-        circle.set("stroke", color);
-        canvas.requestRenderAll()
-    }
-
-    //set circle border color to transparent
-    static setBorderColorToDefault(circle){
-        Atom.setBorderColor(circle, "#56519f00")
-    }
 }
 
 //class Bond
@@ -356,6 +383,8 @@ class SimpleBond{
         this.draw();
     }
 
+    static length = 30;
+
     draw(){
         Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y)
         if (this.isAddCircle){
@@ -363,6 +392,7 @@ class SimpleBond{
         }
     }
 
+    //add circles on corners
     addCircle(){
         const circle = new fabric.Circle({
             originCenter: this.point1,
@@ -399,7 +429,7 @@ class SimpleBond{
     static drawOutsidePolyg (circle){
         const x = circle.left
         const y = circle.top
-        const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, 50)
+        const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, SimpleBond.length)
         const x2 = point.x
         const y2 = point.y
         //const lineAngle = point.angle
@@ -444,6 +474,17 @@ class Canvas{
         canvas.add(line).requestRenderAll()
         return line;
     }
+
+        //set object border color to blue on hover
+        static setBorderColor(object, color = "blue"){
+            object.set("stroke", color);
+            canvas.requestRenderAll()
+        }
+    
+        //set object border color to transparent
+        static setBorderColorToDefault(object){
+            Canvas.setBorderColor(object, "#56519f00")
+        }
 }
 
 //Toolbar class:
@@ -461,16 +502,18 @@ class Toolbar{
     static action(target, coord=null){
         switch (this.tool) {
             case "polygone":
-                if(target == null){
+                if(target == "canvas"){
                     return new Polygone(coord.x, coord.y, Toolbar.toolType, polygRadius)
                 }
                 Toolbar.polygoneAction(target)
                 break;
-            case "clickOnLine":
-                console.log(event)
+                
+            case "bond":
+                console.log(this.tool)
                 break;
-            case "clickOnBond":
-                console.log(event)
+
+            case "symbole":
+                console.log(this.tool)
                 break;
         
             default:
@@ -484,12 +527,13 @@ class Toolbar{
         switch (target.type) {
             case "circle":
                 const bond = SimpleBond.drawOutsidePolyg(target)
-                console.log(this.toolType, bond.circle)
                 Polygone.draw2(bond.circle, this.toolType, polygRadius)
                 break;
+
             case "line":
                 console.log(event)
                 break;
+
             case "bond":
                 console.log(event)
                 break;
@@ -507,48 +551,48 @@ class Toolbar{
 //set the fabric canvas
 const canvas = new fabric.Canvas('canvas');
 canvas.setDimensions({width: 1500, height: 600});
+canvas.hoverCursor = 'pointer';
 
 //polygone radius
-const polygRadius = 50
+const polygRadius = 30
+
+//set default tool
+const toolBtn = document.querySelector('.tool.active');
+Toolbar.setCurrentTool(toolBtn)
 
 
-//EVENT: click
+//EVENT: canvas click
 canvas.on('mouse:down', function(e){
     const x = e.pointer.x
     const y = e.pointer.y
 
     if (e.target && e.target.type == "circle"){
         Toolbar.action(e.target)
-        //return SimpleBond.drawOutsidePolyg(e.target)
   
-    }else if(e.target && e.target.type == "line"){
-
-        return SimpleBond.drawInsidePolyg(e.target)
+    }else if(e.target && e.target.type == "side"){
+        return SimpleBond.drawInsidePolyg(e.target.line)
         
     }else if(e.target && e.target.type == "bond"){
 
         return Polygone.draw2(e.target, 3, polygRadius)
   
     }else{
-        Toolbar.action(null, {x, y})
-        //return new Polygone(x, y, "benzene", polygRadius)
-        //return new Polygone(x, y, 5, polygRadius) //5:angle+180 / 3:angle+90
+        Toolbar.action("canvas", {x, y})
     }
 
 });
 
-//EVENT: hover
+//EVENT: Canvas hover
 canvas.on('mouse:over', function(e){
-    if (e.target && (e.target.type == "circle" || e.target.type == "bond")){
-        const circle = e.target;
-        Atom.setBorderColor(circle)
+    if (e.target && (e.target.type == "circle" || e.target.type == "bond" || e.target.type == "side")){
+        Canvas.setBorderColor(e.target)
     }
 })
 
+//EVENT: canvas hover out
 canvas.on('mouse:out', function(e){
-    if (e.target && (e.target.type == "circle" || e.target.type == "bond") ){
-        const circle = e.target;
-        Atom.setBorderColorToDefault(circle)
+    if (e.target && (e.target.type == "circle" || e.target.type == "bond" || e.target.type == "side") ){
+        Canvas.setBorderColorToDefault(e.target)
     }
 })
 
@@ -556,7 +600,11 @@ canvas.on('mouse:out', function(e){
 document.querySelectorAll('.tool').forEach(tool => {
     tool.addEventListener('click', e => {
         e.stopPropagation();
-        const btn = e.currentTarget
+        const btn = e.currentTarget;
+        //delete active class from current tool
+        document.querySelector('.tool.active').classList.remove('active');
+        //add active class to the new tool
+        btn.classList.add('active')
         Toolbar.setCurrentTool(btn)
     })
   })
