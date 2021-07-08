@@ -477,8 +477,10 @@ class DashedBond extends SimpleBond{
 
     draw(){
         const line = new fabric.Line([this.point1.x, this.point1.y, this.point2.x, this.point2.y], {
-            strokeDashArray: [5, 5],
+            strokeDashArray: [5, 3],
             strokeWidth: 2,
+            originX: 'center',
+            originY: 'center',
             stroke: 'black'
         });
         canvas.add(line).requestRenderAll()
@@ -497,6 +499,39 @@ class DashedBond extends SimpleBond{
   
         //add a simple bond
         return new DashedBond({x: x, y: y}, {x: x2, y: y2})
+    }
+}
+
+//Hashed Bond class
+class HashedBond extends SimpleBond{
+    constructor(point1, point2) {
+        super(point1, point2)
+    }
+
+    draw(){
+        const line = new fabric.Line([this.point1.x, this.point1.y, this.point2.x, this.point2.y], {
+            strokeDashArray: [2, 3],
+            strokeWidth: 4,
+            originX: 'center',
+            originY: 'center',
+            stroke: 'black'
+        });
+        canvas.add(line).requestRenderAll()
+        if (this.isAddCircle){
+            this.addCircle()
+        }
+    }
+
+    static drawOutsidePolyg (circle){
+        const x = circle.left
+        const y = circle.top
+        const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, SimpleBond.length)
+        const x2 = point.x
+        const y2 = point.y
+        //const lineAngle = point.angle
+  
+        //add a simple bond
+        return new HashedBond({x: x, y: y}, {x: x2, y: y2})
     }
 }
 
@@ -630,6 +665,9 @@ class Toolbar{
                     break;
                 case "dashed":
                     return DashedBond.drawOutsidePolyg(target)
+                    break;
+                case "hashed":
+                    return HashedBond.drawOutsidePolyg(target)
                     break;
             
                 default:
