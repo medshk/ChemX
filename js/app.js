@@ -469,6 +469,37 @@ class BoldBond extends SimpleBond{
     }
 }
 
+//Dashed Bond class
+class DashedBond extends SimpleBond{
+    constructor(point1, point2) {
+        super(point1, point2)
+    }
+
+    draw(){
+        const line = new fabric.Line([this.point1.x, this.point1.y, this.point2.x, this.point2.y], {
+            strokeDashArray: [5, 5],
+            strokeWidth: 2,
+            stroke: 'black'
+        });
+        canvas.add(line).requestRenderAll()
+        if (this.isAddCircle){
+            this.addCircle()
+        }
+    }
+
+    static drawOutsidePolyg (circle){
+        const x = circle.left
+        const y = circle.top
+        const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, SimpleBond.length)
+        const x2 = point.x
+        const y2 = point.y
+        //const lineAngle = point.angle
+  
+        //add a simple bond
+        return new DashedBond({x: x, y: y}, {x: x2, y: y2})
+    }
+}
+
 //Canvas class: handle drawing
 class Canvas{
     static getPointFromOrigin (origin, point, distance){
@@ -596,6 +627,9 @@ class Toolbar{
                     break;
                 case "bold":
                     return BoldBond.drawOutsidePolyg(target)
+                    break;
+                case "dashed":
+                    return DashedBond.drawOutsidePolyg(target)
                     break;
             
                 default:
