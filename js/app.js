@@ -1,10 +1,9 @@
 //Polygone: class
 class Polygone{
-    constructor(x, y, type, radius, rotation=0){
+    constructor(x, y, type, rotation=0){
         this.x = x;
         this.y = y;
         this.type = type;
-        this.radius = radius;
         this.rotation = rotation;
         this.atoms = [];
         this.bonds = [];
@@ -12,6 +11,8 @@ class Polygone{
         this.element = null;
         this.draw(); //draw the polygone
     }
+
+    static radius = 30;
 
     static getNbrSides(type){
         switch (type) {
@@ -61,26 +62,28 @@ class Polygone{
     //Polygone method without bonds inside
     drawSimplePolygone(){
         const nbrSides = Polygone.getNbrSides(this.type)
+        let radius = Polygone.radius;
         switch (nbrSides) {
         case 6:
             this.rotation += 30
             break;
         case 5:
             this.rotation += 270
+            radius = radius/1.2
             break;
         case 4:
             this.rotation += 45
-            this.radius = this.radius/1.5
+            radius = radius/1.35
             break;
         case 3:
-            this.radius = this.radius/1.5;
+            radius = radius/1.57;
             break;
         
         default:
             break;
         }
 
-        const points = this.regularPolygonPoints(nbrSides, this.radius)
+        const points = this.regularPolygonPoints(nbrSides, radius)
 
         this.element = new fabric.Polygon(points, {
             //id: polygonCounter++,
@@ -115,7 +118,7 @@ class Polygone{
     //Benzene method: hexagone(6) with bonds inside
     drawBenzene(){
         const nbrSides = Polygone.getNbrSides(this.type)
-        const points = this.regularPolygonPoints(nbrSides, this.radius)
+        const points = this.regularPolygonPoints(nbrSides, Polygone.radius)
 
         this.rotation += 30;
 
@@ -164,7 +167,7 @@ class Polygone{
     //Cyclopentadiene method: pentagone(5) with bonds inside
     drawCyclopentadiene(){
         const nbrSides = Polygone.getNbrSides(this.type)
-        const points = this.regularPolygonPoints(nbrSides, this.radius)
+        const points = this.regularPolygonPoints(nbrSides, Polygone.radius)
 
         this.rotation += 270;
 
@@ -291,6 +294,7 @@ class Polygone{
                 line: line,
                 type: 'side',
                 originCenter: this.element.center,
+                center: midpoint,
                 width: 8, 
                 height: 28, 
                 left: midpoint.x + 0.5, 
@@ -312,10 +316,10 @@ class Polygone{
         })
     }
 
-    static draw2(circle, type, radius){
+    static draw2(circle, type){
         const nbrSides = Polygone.getNbrSides(type)
         let angle = 0;
-        let originRadius = radius;
+        let originRadius = Polygone.radius;
         switch (nbrSides) {
             case 3:
                 //radius = radius/1.5;
@@ -323,7 +327,7 @@ class Polygone{
                 angle = 90;
                 break;
             case 5:
-                originRadius += -5;
+                originRadius += -7;
                 angle = 180;
                 break;
             case 4:
@@ -340,7 +344,7 @@ class Polygone{
   
         const polygOrigin = Canvas.getPointFromOrigin(bondOrigin, {x: x2, y: y2}, originRadius)//5: rad-5, 3:rad-7
   
-        return new Polygone(polygOrigin.x, polygOrigin.y, type, radius, polygOrigin.angle + angle) //5:angle+180 / 3:angle+90
+        return new Polygone(polygOrigin.x, polygOrigin.y, type, polygOrigin.angle + angle) //5:angle+180 / 3:angle+90
     }
 }
 
@@ -383,7 +387,7 @@ class SimpleBond{
         this.draw();
     }
 
-    static length = 30;
+    static length = 28;
 
     draw(){
         Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y)
@@ -439,6 +443,32 @@ class SimpleBond{
     }
 }
 
+//BoldBond class
+class BoldBond extends SimpleBond{
+    constructor(point1, point2) {
+        super(point1, point2)
+    }
+
+    draw(){
+        Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y, false, 4)
+        if (this.isAddCircle){
+            this.addCircle()
+        }
+    }
+
+    static drawOutsidePolyg (circle){
+        const x = circle.left
+        const y = circle.top
+        const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, SimpleBond.length)
+        const x2 = point.x
+        const y2 = point.y
+        //const lineAngle = point.angle
+  
+        //add a simple bond
+        return new BoldBond({x: x, y: y}, {x: x2, y: y2})
+    }
+}
+
 //Canvas class: handle drawing
 class Canvas{
     static getPointFromOrigin (origin, point, distance){
@@ -460,12 +490,17 @@ class Canvas{
         return {x: x2, y: y2, angle: angle}
     }
 
-    static drawLine(x1, y1, x2, y2, origin = false){
+    static drawLine(x1, y1, x2, y2, origin = false, strokeWidth = 2){
+        const angle = Canvas.getPointFromOrigin({x:x1,y:y1}, {x:x2,y:y2}, 5).angle
         const line = new fabric.Line([x1, y1, x2, y2], {
             type: "line",
             stroke: 'black',
-            strokeWidth: 2,
+            strokeWidth: strokeWidth,
+            lineAngle: angle,
+            evented: false,
             originCenter: {x: origin.x, y: origin.y},
+            originX: 'center',
+            originY: 'center',
             hasControls: false,
             hasBorders: false,
             selectable: false
@@ -475,16 +510,25 @@ class Canvas{
         return line;
     }
 
-        //set object border color to blue on hover
-        static setBorderColor(object, color = "blue"){
-            object.set("stroke", color);
-            canvas.requestRenderAll()
-        }
-    
-        //set object border color to transparent
-        static setBorderColorToDefault(object){
-            Canvas.setBorderColor(object, "#56519f00")
-        }
+    //calculate the distance between 2 points
+    static distance(p1, p2) {
+        const x1 = p1.x
+        const x2 = p2.x
+        const y1 = p1.y
+        const y2 = p2.y
+        return Math.hypot(x2-x1, y2-y1)
+    }
+
+    //set object border color to blue on hover
+    static setBorderColor(object, color = "blue"){
+        object.set("stroke", color);
+        canvas.requestRenderAll()
+    }
+
+    //set object border color to transparent
+    static setBorderColorToDefault(object){
+        Canvas.setBorderColor(object, "#56519f00")
+    }
 }
 
 //Toolbar class:
@@ -503,13 +547,13 @@ class Toolbar{
         switch (this.tool) {
             case "polygone":
                 if(target == "canvas"){
-                    return new Polygone(coord.x, coord.y, Toolbar.toolType, polygRadius)
+                    return new Polygone(coord.x, coord.y, Toolbar.toolType)
                 }
-                Toolbar.polygoneAction(target)
+                return Toolbar.polygoneAction(target)
                 break;
                 
             case "bond":
-                console.log(this.tool)
+                return this.BondAction(target)
                 break;
 
             case "symbole":
@@ -521,25 +565,44 @@ class Toolbar{
         }
     }
 
-    static polygoneAction(target, coord){
-        const x = target.left;
-        const y = target.top;
+    static polygoneAction(target){
         switch (target.type) {
             case "circle":
                 const bond = SimpleBond.drawOutsidePolyg(target)
-                Polygone.draw2(bond.circle, this.toolType, polygRadius)
+                return Polygone.draw2(bond.circle, this.toolType)
                 break;
 
-            case "line":
-                console.log(event)
+            case "side":
+                const distance = Canvas.distance(target.originCenter, target.center)
+                const point = Canvas.getPointFromOrigin(target.originCenter, target.center, distance)
+                const angle = target.line.lineAngle + 180
+                return new Polygone(point.x, point.y, Toolbar.toolType, angle)
                 break;
 
             case "bond":
-                console.log(event)
+                return Polygone.draw2(target, this.toolType)
                 break;
         
             default:
                 break;
+        }
+    }
+
+    static BondAction(target){
+        if(target.type == "circle"){
+            switch (Toolbar.toolType) {
+                case "simple":
+                    return SimpleBond.drawOutsidePolyg(target)
+                    break;
+                case "bold":
+                    return BoldBond.drawOutsidePolyg(target)
+                    break;
+            
+                default:
+                    break;
+            }
+        }else if(target.type == "side"){
+            return SimpleBond.drawInsidePolyg(target.line)
         }
     }
 }
@@ -553,9 +616,6 @@ const canvas = new fabric.Canvas('canvas');
 canvas.setDimensions({width: 1500, height: 600});
 canvas.hoverCursor = 'pointer';
 
-//polygone radius
-const polygRadius = 30
-
 //set default tool
 const toolBtn = document.querySelector('.tool.active');
 Toolbar.setCurrentTool(toolBtn)
@@ -566,17 +626,9 @@ canvas.on('mouse:down', function(e){
     const x = e.pointer.x
     const y = e.pointer.y
 
-    if (e.target && e.target.type == "circle"){
-        Toolbar.action(e.target)
-  
-    }else if(e.target && e.target.type == "side"){
-        return SimpleBond.drawInsidePolyg(e.target.line)
-        
-    }else if(e.target && e.target.type == "bond"){
-
-        return Polygone.draw2(e.target, 3, polygRadius)
-  
-    }else{
+    if(e.target)
+    Toolbar.action(e.target)
+    else{
         Toolbar.action("canvas", {x, y})
     }
 
