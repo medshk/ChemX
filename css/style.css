@@ -50,7 +50,7 @@ li.nav-item.dropdown {
 }
 
 .toolbar {
-    width: 130px;
+    width: 200px;
     height: 100%;
     display: flex;
     flex-wrap: wrap;
