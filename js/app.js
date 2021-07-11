@@ -673,6 +673,106 @@ class DoubleBond{
     }
 }
 
+//Hashed Wedged Bond class
+class HashedWedgedBond{
+    constructor(points) {
+        this.points = points;
+        this.circle = null;
+        this.draw()
+    }
+
+    draw(){
+        this.points.forEach((point) => {
+            const x1 = point.p1.x
+            const y1 = point.p1.y
+            const x2 = point.p2.x
+            const y2 = point.p2.y
+            Canvas.drawLine(x1, y1, x2, y2)
+        });
+
+        this.addCircle()
+    }
+
+    //add circles on corners
+    addCircle(){
+        //midpoint of both lines start points
+        const lastLine = this.points[this.points.length - 1]
+        const originCenter = {x: (lastLine.p1.x + lastLine.p2.x)/2,
+            y: (lastLine.p1.y + lastLine.p2.y)/2}; 
+
+        //midpoint of both lines end points
+        const firstLine = this.points[0]
+        const coord = {x: (firstLine.p1.x + firstLine.p2.x)/2,
+            y: (firstLine.p1.y + firstLine.p2.y)/2}; 
+
+        const circle = new fabric.Circle({
+            originCenter: originCenter,
+            type: "bond",
+            left: coord.x,
+            top: coord.y,
+            radius: 10,
+            strokeWidth: 2,
+            fill: "#56519f00",
+            originX: "center",
+            originY: "center",
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
+        });
+        
+        this.circle = circle;
+        canvas.add(circle).requestRenderAll()
+
+    }
+
+    static getNewPoints(line){
+        const points = line.calcLinePoints();
+        const matrix = line.calcTransformMatrix();
+        const point1 = fabric.util.transformPoint({ x: points.x1, y: points.y1 }, matrix);
+        const point2 = fabric.util.transformPoint({ x: points.x2, y: points.y2 }, matrix);
+
+        return{point1, point2}
+    }
+
+    static drawOutsidePolyg (circle){
+        let point = Canvas.getPointFromOrigin(circle.originCenter, {x:circle.left, y:circle.top}, Polygone.sideLength - 4)
+        const x1 = point.x
+        const y1 = point.y
+        point = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:x1, y:y1}, 8 )
+        const x2 = point.x
+        const y2 = point.y
+
+        const line = new fabric.Line([x1, y1, x2, y2], {
+            strokeWidth: 2,
+            angle: 90,
+            originX: 'center',
+            originY: 'center',
+            stroke: 'black'
+        });
+        //canvas.add(line).requestRenderAll()
+
+        //new line points after rotation
+        const points = HashedWedgedBond.getNewPoints(line);
+        const point1 = points.point1
+        const point2 = points.point2
+
+        const bondPoints = []
+        for(let i = 0 ; i > -Polygone.sideLength; i-=4){
+            let p1 = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:point1.x, y:point1.y}, i)
+            let p2 = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:point2.x, y:point2.y}, i)
+
+            bondPoints.push({p1, p2})
+        }
+
+        return new HashedWedgedBond(bondPoints)
+    }
+}
+
+
+
+
+
+
 //Canvas class: handle drawing
 class Canvas{
     static getPointFromOrigin (origin, point, distance){
@@ -834,6 +934,9 @@ class Toolbar{
                     break;
                 case "double":
                     return DoubleBond.drawOutsidePolyg(target)
+                    break;
+                case "hashed-wedged":
+                    return HashedWedgedBond.drawOutsidePolyg(target)
                     break;
             
                 default:
