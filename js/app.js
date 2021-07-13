@@ -324,7 +324,7 @@ class Polygone{
                 angle = 90;
                 break;
             case 5:
-                originRadius -= 5;
+                originRadius -= 4;
                 angle = 180;
                 break;
             case 4:
@@ -757,7 +757,7 @@ class HashedWedgedBond{
         const point2 = points.point2
 
         const bondPoints = []
-        for(let i = 0 ; i > -Polygone.sideLength; i-=4){
+        for(let i = 0 ; i > -Polygone.sideLength; i-=5){
             let p1 = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:point1.x, y:point1.y}, i)
             let p2 = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:point2.x, y:point2.y}, i)
 
@@ -768,8 +768,130 @@ class HashedWedgedBond{
     }
 }
 
+//wedged bond class
+class WedgedBond{
+    constructor(points) {
+        this.points = points;
+        this.circle = null;
+        this.draw()
+    }
+
+    draw(){
+        const triangle = new fabric.Polygon(this.points, {
+            fill: 'black',
+            stroke: 'black',
+            strokeWidth: 2,
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
+        });
+        canvas.add(triangle).requestRenderAll()
+        this.addCircle()
+    }
+
+    //add circles on corners
+    addCircle(){
+        const originCenter =  this.points[this.points.length - 1]
+
+        const coord = {x: (this.points[0].x + this.points[1].x)/2,
+            y: (this.points[0].y + this.points[1].y)/2};
+
+        const circle = new fabric.Circle({
+            originCenter: originCenter,
+            type: "bond",
+            left: coord.x,
+            top: coord.y,
+            radius: 10,
+            strokeWidth: 2,
+            fill: "#56519f00",
+            originX: "center",
+            originY: "center",
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
+        });
+        
+        this.circle = circle;
+        canvas.add(circle).requestRenderAll()
+
+    }
+
+    static drawOutsidePolyg (circle){
+        let point = Canvas.getPointFromOrigin(circle.originCenter, {x:circle.left, y:circle.top}, Polygone.sideLength - 3)
+        const x1 = point.x
+        const y1 = point.y
+        point = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:x1, y:y1}, 6 )
+        const x2 = point.x
+        const y2 = point.y
+
+        const line = new fabric.Line([x1, y1, x2, y2], {
+            strokeWidth: 2,
+            angle: 90,
+            originX: 'center',
+            originY: 'center',
+            stroke: 'black'
+        });
+        //canvas.add(line).requestRenderAll()
+
+        //new line points after rotation
+        const points = HashedWedgedBond.getNewPoints(line);
+        const point1 = points.point1
+        const point2 = points.point2
+        const point3 = {x:circle.left, y:circle.top}
+        const bondPoints = [point1, point2, point3]
 
 
+        return new WedgedBond(bondPoints)
+    }
+}
+
+//wedged bond class
+class HollowBond extends WedgedBond{
+    constructor(points) {
+        super(points)
+    }
+
+    draw(){
+        const triangle = new fabric.Polygon(this.points, {
+            fill: '',
+            stroke: 'black',
+            strokeWidth: 2,
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
+        });
+        canvas.add(triangle).requestRenderAll()
+        this.addCircle()
+    }
+
+    static drawOutsidePolyg (circle){
+        let point = Canvas.getPointFromOrigin(circle.originCenter, {x:circle.left, y:circle.top}, Polygone.sideLength - 3)
+        const x1 = point.x
+        const y1 = point.y
+        point = Canvas.getPointFromOrigin({x:circle.left, y:circle.top}, {x:x1, y:y1}, 6 )
+        const x2 = point.x
+        const y2 = point.y
+
+        const line = new fabric.Line([x1, y1, x2, y2], {
+            strokeWidth: 2,
+            angle: 90,
+            originX: 'center',
+            originY: 'center',
+            stroke: 'black'
+        });
+        //canvas.add(line).requestRenderAll()
+
+        //new line points after rotation
+        const points = HashedWedgedBond.getNewPoints(line);
+        const point1 = points.point1
+        const point2 = points.point2
+        const point3 = {x:circle.left, y:circle.top}
+        const bondPoints = [point1, point2, point3]
+
+
+        return new HollowBond(bondPoints)
+    }
+}
 
 
 
@@ -937,6 +1059,12 @@ class Toolbar{
                     break;
                 case "hashed-wedged":
                     return HashedWedgedBond.drawOutsidePolyg(target)
+                    break;
+                case "wedged":
+                    return WedgedBond.drawOutsidePolyg(target)
+                    break;
+                case "hollow":
+                    return HollowBond.drawOutsidePolyg(target)
                     break;
             
                 default:
