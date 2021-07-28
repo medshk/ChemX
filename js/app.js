@@ -480,7 +480,10 @@ class DashedBond extends SimpleBond{
             strokeWidth: 2,
             originX: 'center',
             originY: 'center',
-            stroke: 'black'
+            stroke: 'black',
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
         });
         canvas.add(line).requestRenderAll()
         if (this.isAddCircle){
@@ -513,7 +516,10 @@ class HashedBond extends SimpleBond{
             strokeWidth: 4,
             originX: 'center',
             originY: 'center',
-            stroke: 'black'
+            stroke: 'black',
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
         });
         canvas.add(line).requestRenderAll()
         if (this.isAddCircle){
@@ -559,7 +565,10 @@ class DoubleBond{
             strokeWidth: 2,
             originX: 'center',
             originY: 'center',
-            stroke: 'black'
+            stroke: 'black',
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
         });
         this.line1 = line1;
         canvas.add(line1).requestRenderAll()
@@ -893,7 +902,98 @@ class HollowBond extends WedgedBond{
     }
 }
 
+//Text class
+class Text{
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.display()
+    }
 
+    display(){
+        const text = new fabric.IText('Text', 
+        {   type: "text",
+            left: this.x, 
+            top: this.y,
+        });
+        canvas.add(text);
+    }
+}
+
+//Arrow class:
+class Arrow{
+    static element = null;
+    constructor(x1, y1, x2, y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.draw();
+    }
+    draw(){
+        let fromx = this.x1;
+        let fromy = this.y1;
+        let tox = this.x2;
+        let toy = this.y2;
+
+        var angle = Math.atan2(toy - fromy, tox - fromx);
+    
+        var headlen = 15;  // arrow head size
+    
+        // bring the line end back some to account for arrow head.
+        tox = tox - (headlen) * Math.cos(angle);
+        toy = toy - (headlen) * Math.sin(angle);
+    
+        // calculate the points.
+        var points = [
+            {
+                x: fromx,  // start point
+                y: fromy
+            }, {
+                x: fromx - (headlen / 4) * Math.cos(angle - Math.PI / 2), 
+                y: fromy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
+            },{
+                x: tox - (headlen / 4) * Math.cos(angle - Math.PI / 2), 
+                y: toy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
+            }, {
+                x: tox - (headlen) * Math.cos(angle - Math.PI / 2),
+                y: toy - (headlen) * Math.sin(angle - Math.PI / 2)
+            },{
+                x: tox + (headlen) * Math.cos(angle),  // tip
+                y: toy + (headlen) * Math.sin(angle)
+            }, {
+                x: tox - (headlen) * Math.cos(angle + Math.PI / 2),
+                y: toy - (headlen) * Math.sin(angle + Math.PI / 2)
+            }, {
+                x: tox - (headlen / 4) * Math.cos(angle + Math.PI / 2),
+                y: toy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
+            }, {
+                x: fromx - (headlen / 4) * Math.cos(angle + Math.PI / 2),
+                y: fromy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
+            },{
+                x: fromx,
+                y: fromy
+            }
+        ];
+    
+        var pline = new fabric.Polyline(points, {
+            fill: 'black',
+            stroke: 'black',
+            opacity: 1,
+            strokeWidth: 2,
+            originX: 'left',
+            originY: 'top',
+            selectable: true
+        });
+        
+        Arrow.element = pline;
+        canvas.add(pline);
+    
+        canvas.renderAll();
+    
+    }
+    
+}
 
 //Canvas class: handle drawing
 class Canvas{
@@ -1003,6 +1103,14 @@ class Toolbar{
             case "symbole":
                 console.log(this.tool)
                 break;
+
+            case "text":
+                return this.textAction(coord)
+                break;
+
+            /* case "arrow":
+                return this.arrowAction(coord)
+                break; */
         
             default:
                 break;
@@ -1027,7 +1135,7 @@ class Toolbar{
                     angle += 17.8
                 }
                 const point = Canvas.getPointFromOrigin(target.originCenter, target.center, distance)
-                return new Polygone(point.x, point.y, Toolbar.toolType, angle)
+                return new Polygone(point.x, point.y, Toolbar.toolType, angle);
                 break;
 
             case "bond":
@@ -1074,6 +1182,14 @@ class Toolbar{
             return SimpleBond.drawInsidePolyg(target.line)
         }
     }
+
+    static textAction(coord){
+        return new Text(coord.x, coord.y)
+    }
+
+    static arrowAction(coord){
+        return new Arrow(coord.x, coord.y)
+    }
 }
 
 
@@ -1089,19 +1205,56 @@ canvas.hoverCursor = 'pointer';
 const toolBtn = document.querySelector('.tool.active');
 Toolbar.setCurrentTool(toolBtn)
 
+//arrow variables
+let arrow = fromx = fromy = tox = toy = null;
+let isDown = false;
 
 //EVENT: canvas click
 canvas.on('mouse:down', function(e){
     const x = e.pointer.x
     const y = e.pointer.y
+    if(!e.target && Toolbar.tool == "text"){
+        Toolbar.action("canvas", {x, y})
 
-    if(e.target)
-    Toolbar.action(e.target)
-    else{
+    }else if (e.target && Toolbar.tool !== "text"){
+        Toolbar.action(e.target)
+
+    }else if(Toolbar.tool == "arrow"){
+        isDown = true;
+        fromx = x;
+        fromy = y;
+
+    }else if (!e.target){
         Toolbar.action("canvas", {x, y})
     }
-
 });
+
+//EVENT: mouse move
+canvas.on("mouse:move", function(e){
+    let x = e.pointer.x
+    let y = e.pointer.y
+    if(Toolbar.tool === "arrow" && isDown){
+        tox = x;
+        toy = y
+        canvas.remove(Arrow.element)
+        const arrow = new Arrow(fromx, fromy, tox, toy)
+    }
+})
+
+canvas.on("mouse:move:before", function(e){
+    if(Toolbar.tool === "arrow" && isDown){
+        canvas.remove(Arrow.element)
+    }
+})
+
+
+//EVENT:mouse up
+canvas.on("mouse:up", function(e){
+    isDown = false;
+    if(Toolbar.tool === "arrow"){
+        Arrow.element = null
+    }
+})
 
 //EVENT: Canvas hover
 canvas.on('mouse:over', function(e){
