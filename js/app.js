@@ -80,7 +80,7 @@ class Polygone{
         const points = this.regularPolygonPoints(nbrSides, radius)
 
         this.element = new fabric.Polygon(points, {
-            id: Polygone.polygId++,
+            id: Polygone.polygId,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -101,7 +101,7 @@ class Polygone{
         let centroid = this.getPolygCentroid(polygPoints)
     
         this.element['center'] = centroid
-
+        Canvas.drawCentroid(centroid, Polygone.polygId)
         
         let circles = this.addCircles(this.element, false)
         
@@ -110,6 +110,8 @@ class Polygone{
         this.addSquare()
 
         canvas.add(...circles).requestRenderAll();
+
+        Polygone.polygId++;
     }
 
     //Benzene method: hexagone(6) with bonds inside
@@ -120,7 +122,7 @@ class Polygone{
         this.rotation += 30;
 
         this.element = new fabric.Polygon(points, {
-            id: Polygone.polygId++,
+            id: Polygone.polygId,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -143,6 +145,7 @@ class Polygone{
         
         //add centroid coord to polygone attributes
         this.element['center'] = centroid
+        Canvas.drawCentroid(centroid, Polygone.polygId)
 
         //add circles
         let circles = this.addCircles(this.element, false)
@@ -159,6 +162,7 @@ class Polygone{
 
         this.addSquare()
         canvas.add(...circles).requestRenderAll();
+        Polygone.polygId++;
     }
 
     //Cyclopentadiene method: pentagone(5) with bonds inside
@@ -169,7 +173,7 @@ class Polygone{
         this.rotation += 270;
 
         this.element = new fabric.Polygon(points, {
-            id: Polygone.polygId++,
+            id: Polygone.polygId,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -192,6 +196,7 @@ class Polygone{
         
         //add centroid coord to polygone attributes
         this.element['center'] = centroid
+        Canvas.drawCentroid(centroid, Polygone.polygId)
 
         //add circles
         let circles = this.addCircles(this.element, false)
@@ -208,6 +213,7 @@ class Polygone{
 
         this.addSquare()
         canvas.add(...circles).requestRenderAll();
+        Polygone.polygId++;
     }
 
     regularPolygonPoints = (sideCount, radius) => {
@@ -226,11 +232,11 @@ class Polygone{
     drawPolygByLine(circles){
         circles.forEach((c, index) => {
             if (index == circles.length -1){
-                const line = Canvas.drawLine(c.left, c.top, circles[0].left, circles[0].top, c.originCenter, _, circles.polygId);
+                const line = Canvas.drawLine(c.left, c.top, circles[0].left, circles[0].top, c.originCenter, undefined, c.polygId);
                 this.lines.push(line)
             }
             else{
-                const line = Canvas.drawLine(c.left, c.top, circles[index+1].left, circles[index+1].top, c.originCenter, _, circles.polygId);
+                const line = Canvas.drawLine(c.left, c.top, circles[index+1].left, circles[index+1].top, c.originCenter, undefined, c.polygId);
                 this.lines.push(line)
             }
         });
@@ -289,6 +295,7 @@ class Polygone{
                             angle: Canvas.getPointFromOrigin(point1, point2, 4).angle
                             } 
             const square = new fabric.Rect({
+                polygId: line.polygId,
                 line: line,
                 type: 'side',
                 originCenter: this.element.center,
@@ -377,10 +384,11 @@ class Atom{
 
 //class Bond
 class SimpleBond{
-    constructor(point1, point2, isAddCircle = true){
+    constructor(point1, point2, polygId, isAddCircle = true){
         this.point1 = point1;
         this.point2 = point2;
         this.origin = origin;
+        this.polygId = polygId;
         this.circle = null;
         this.isAddCircle = isAddCircle;
         this.draw();
@@ -389,7 +397,7 @@ class SimpleBond{
     static length = Polygone.sideLength;
 
     draw(){
-        Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y)
+        Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y, this.point1.origin, undefined, this.polygId)
         if (this.isAddCircle){
             this.addCircle()
         }
@@ -398,7 +406,8 @@ class SimpleBond{
     //add circles on corners
     addCircle(){
         const circle = new fabric.Circle({
-            originCenter: this.point1,
+            polygId: this.polygId,
+            originCenter: this.point1.origin,
             type: "bond",
             left: this.point2.x,
             top: this.point2.y,
@@ -439,18 +448,18 @@ class SimpleBond{
         //const lineAngle = point.angle
   
         //add a simple bond
-        return new SimpleBond({x: x, y: y}, {x: x2, y: y2})
+        return new SimpleBond({x: x, y: y, origin: circle.originCenter}, {x: x2, y: y2}, circle.polygId)
     }
 }
 
 //BoldBond class
 class BoldBond extends SimpleBond{
-    constructor(point1, point2) {
-        super(point1, point2)
+    constructor(point1, point2, polygId) {
+        super(point1, point2, polygId)
     }
 
     draw(){
-        Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y, false, 4)
+        Canvas.drawLine(this.point1.x, this.point1.y, this.point2.x, this.point2.y, this.point1.origin, 4, this.polygId)
         if (this.isAddCircle){
             this.addCircle()
         }
@@ -465,18 +474,19 @@ class BoldBond extends SimpleBond{
         //const lineAngle = point.angle
   
         //add a simple bond
-        return new BoldBond({x: x, y: y}, {x: x2, y: y2})
+        return new BoldBond({x: x, y: y,  origin: circle.originCenter}, {x: x2, y: y2}, circle.polygId)
     }
 }
 
 //Dashed Bond class
 class DashedBond extends SimpleBond{
-    constructor(point1, point2) {
-        super(point1, point2)
+    constructor(point1, point2, polygId) {
+        super(point1, point2, polygId)
     }
 
     draw(){
         const line = new fabric.Line([this.point1.x, this.point1.y, this.point2.x, this.point2.y], {
+            polygId: this.polygId,
             strokeDashArray: [5, 3],
             strokeWidth: 2,
             originX: 'center',
@@ -498,21 +508,21 @@ class DashedBond extends SimpleBond{
         const point = Canvas.getPointFromOrigin(circle.originCenter, {x, y}, SimpleBond.length)
         const x2 = point.x
         const y2 = point.y
-        //const lineAngle = point.angle
   
         //add a simple bond
-        return new DashedBond({x: x, y: y}, {x: x2, y: y2})
+        return new DashedBond({x: x, y: y, origin:circle.originCenter}, {x: x2, y: y2}, circle.polygId)
     }
 }
 
 //Hashed Bond class
 class HashedBond extends SimpleBond{
-    constructor(point1, point2) {
-        super(point1, point2)
+    constructor(point1, point2, polygId) {
+        super(point1, point2, polygId)
     }
 
     draw(){
         const line = new fabric.Line([this.point1.x, this.point1.y, this.point2.x, this.point2.y], {
+            polygId: this.polygId,
             strokeDashArray: [2, 3],
             strokeWidth: 4,
             originX: 'center',
@@ -537,17 +547,18 @@ class HashedBond extends SimpleBond{
         //const lineAngle = point.angle
   
         //add a simple bond
-        return new HashedBond({x: x, y: y}, {x: x2, y: y2})
+        return new HashedBond({x: x, y: y, origin: circle.originCenter}, {x: x2, y: y2}, circle.polygId)
     }
 }
 
 //Double bond class
 class DoubleBond{
-    constructor(point1, point2, point3, point4) {
+    constructor(point1, point2, point3, point4, polygId) {
         this.point1 = point1;
         this.point2 = point2;
         this.point3 = point3;
         this.point4 = point4;
+        this.polygId = polygId;
         this.circle = null;
         this.line1 = null;
         this.line2 = null;
@@ -572,7 +583,6 @@ class DoubleBond{
             selectable: false
         });
         this.line1 = line1;
-        canvas.add(line1).requestRenderAll()
 
 
         x1 =points.point2.x
@@ -587,8 +597,14 @@ class DoubleBond{
             stroke: 'black'
         });
         this.line2 = line2
-        canvas.add(line2).requestRenderAll()
+
+        let group = new fabric.Group([line1, line2],{
+            type: "bond_group",
+            polygId: this.polygId
+        })
         
+        
+        canvas.add(group).requestRenderAll()
         this.addCircle()
         
     }
@@ -643,6 +659,7 @@ class DoubleBond{
             y: (this.line1.y2 + this.line2.y2)/2};
 
         const circle = new fabric.Circle({
+            polygId: this.polygId,
             originCenter: originCenter,
             type: "bond",
             left: coord.x,
@@ -679,27 +696,44 @@ class DoubleBond{
         const y4 = point.y
 
         //add a simple bond
-        return new DoubleBond({x: x, y: y}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4})
+        return new DoubleBond({x: x, y: y}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4}, circle.polygId)
     }
 }
 
 //Hashed Wedged Bond class
 class HashedWedgedBond{
-    constructor(points) {
+    constructor(points, polygId) {
         this.points = points;
+        this.polygId = polygId;
         this.circle = null;
         this.draw()
     }
 
     draw(){
+        const lines = []
         this.points.forEach((point) => {
             const x1 = point.p1.x
             const y1 = point.p1.y
             const x2 = point.p2.x
             const y2 = point.p2.y
-            Canvas.drawLine(x1, y1, x2, y2)
+            const line = new fabric.Line([x1, y1, x2, y2], {
+                stroke: 'black',
+                strokeWidth: 2,
+                evented: false,
+                originX: 'center',
+                originY: 'center',
+                hasControls: false,
+                hasBorders: false,
+                selectable: false
+            });
+            lines.push(line)
         });
 
+        const group = new fabric.Group([...lines],{
+            type: "bond_group",
+            polygId: this.polygId
+        })
+        canvas.add(group).requestRenderAll()
         this.addCircle()
     }
 
@@ -716,6 +750,7 @@ class HashedWedgedBond{
             y: (firstLine.p1.y + firstLine.p2.y)/2}; 
 
         const circle = new fabric.Circle({
+            polygId: this.polygId,
             originCenter: originCenter,
             type: "bond",
             left: coord.x,
@@ -774,20 +809,23 @@ class HashedWedgedBond{
             bondPoints.push({p1, p2})
         }
 
-        return new HashedWedgedBond(bondPoints)
+        return new HashedWedgedBond(bondPoints, circle.polygId)
     }
 }
 
 //wedged bond class
 class WedgedBond{
-    constructor(points) {
+    constructor(points, polygId) {
         this.points = points;
+        this.polygId = polygId;
         this.circle = null;
         this.draw()
     }
 
     draw(){
         const triangle = new fabric.Polygon(this.points, {
+            type:"line",
+            polygId: this.polygId,
             fill: 'black',
             stroke: 'black',
             strokeWidth: 2,
@@ -807,6 +845,7 @@ class WedgedBond{
             y: (this.points[0].y + this.points[1].y)/2};
 
         const circle = new fabric.Circle({
+            polygId: this.polygId,
             originCenter: originCenter,
             type: "bond",
             left: coord.x,
@@ -851,18 +890,20 @@ class WedgedBond{
         const bondPoints = [point1, point2, point3]
 
 
-        return new WedgedBond(bondPoints)
+        return new WedgedBond(bondPoints, circle.polygId)
     }
 }
 
 //wedged bond class
 class HollowBond extends WedgedBond{
-    constructor(points) {
-        super(points)
+    constructor(points, polygId) {
+        super(points, polygId)
     }
 
     draw(){
         const triangle = new fabric.Polygon(this.points, {
+            type:"line",
+            polygId: this.polygId,
             fill: '',
             stroke: 'black',
             strokeWidth: 2,
@@ -899,7 +940,7 @@ class HollowBond extends WedgedBond{
         const bondPoints = [point1, point2, point3]
 
 
-        return new HollowBond(bondPoints)
+        return new HollowBond(bondPoints, circle.polygId)
     }
 }
 
@@ -1058,7 +1099,7 @@ class Canvas{
         return {x: x2, y: y2, angle: angle}
     }
 
-    static drawLine(x1, y1, x2, y2, origin = false, strokeWidth = 2, polygId){
+    static drawLine(x1, y1, x2, y2, origin = false, strokeWidth = 2, polygId= null){
         const angle = Canvas.getPointFromOrigin({x:x1,y:y1}, {x:x2,y:y2}, 5).angle
         const line = new fabric.Line([x1, y1, x2, y2], {
             polygId: polygId,
@@ -1110,6 +1151,24 @@ class Canvas{
         const nbrSides = Polygone.getNbrSides(type)
         const r = Polygone.radius * Math.cos(Math.PI / nbrSides)
         return r
+    }
+
+    //draw circle in centroid
+    static drawCentroid(centroid, polygId){
+        const circle = new fabric.Circle({
+            type: "centroid",
+            polygId: polygId,
+            left: centroid.x,
+            top: centroid.y,
+            radius: 5,
+            fill: "#21252900",
+            originX: 'center',
+            originY: 'center',
+            hasControls: false,
+            hasBorders: false,
+            selectable: false
+        })
+        canvas.add(circle).requestRenderAll()
     }
 }
 
@@ -1233,6 +1292,48 @@ class Toolbar{
     static arrowAction(coord){
         return new Arrow(coord.x, coord.y)
     }
+
+    static selectionAction(){
+        canvas.getObjects().forEach(function(element){
+            element.selectable = true
+        });
+        canvas.on('selection:created',function(){
+            console.log("group")
+            if (!canvas.getActiveObject()) {                  
+                 return;
+            }
+            if (canvas.getActiveObject().type !== 'activeSelection') {
+            return;
+            }
+        
+            canvas.getActiveObject().toGroup();
+            canvas.requestRenderAll();
+            console.log("grouping succesfuly");
+        })  
+
+        canvas.on('selection:cleared',function(e)
+        {             
+            if (!canvas.getObjects()) {
+                return;
+            }
+
+            canvas.getObjects().forEach(function(element){
+                if(element.type == 'group')
+                {
+                    var items = element._objects;
+                    element._restoreObjectsState();
+                    canvas.remove(element);
+                    for (var i = 0; i < items.length; i++) {
+                        canvas.add(items[i]);
+                    }
+            
+
+                    console.log("ungrouping succesfuly");                                                 
+                    canvas.requestRenderAll();
+                }
+            })
+        })
+    }
 }
 
 
@@ -1297,13 +1398,16 @@ canvas.on("mouse:move:before", function(e){
     }
 })
 
-
 //EVENT:mouse up
 canvas.on("mouse:up", function(e){
     isDown = false;
     if(Toolbar.tool === "arrow"){
         Arrow.element = null
     }
+
+    /* canvas.getObjects().forEach(function(element){
+        console.log(element.type, element.polygId)
+    });  */
 })
 
 //EVENT: Canvas hover
@@ -1320,6 +1424,7 @@ canvas.on('mouse:out', function(e){
     }
 })
 
+
 //Toolbar events
 document.querySelectorAll('.tool').forEach(tool => {
     tool.addEventListener('click', e => {
@@ -1330,6 +1435,11 @@ document.querySelectorAll('.tool').forEach(tool => {
         //add active class to the new tool
         btn.classList.add('active')
         Toolbar.setCurrentTool(btn)
+
+        //selection tool
+        if(Toolbar.tool === "selection"){
+            Toolbar.selectionAction()
+        }
     })
   })
 
@@ -1470,3 +1580,4 @@ radios5 = document.getElementsByName("fonttype");  // wijzig naar button
             canvas.renderAll();
         }
     }
+
