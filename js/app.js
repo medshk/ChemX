@@ -2,6 +2,7 @@
 class Polygone{
     static sideLength = 30;
     static radius = null;
+    static polygId = 1;
 
     constructor(x, y, type, rotation=0){
         this.x = x;
@@ -79,7 +80,7 @@ class Polygone{
         const points = this.regularPolygonPoints(nbrSides, radius)
 
         this.element = new fabric.Polygon(points, {
-            //id: polygonCounter++,
+            id: Polygone.polygId++,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -119,7 +120,7 @@ class Polygone{
         this.rotation += 30;
 
         this.element = new fabric.Polygon(points, {
-            //id: polygonCounter++,
+            id: Polygone.polygId++,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -168,7 +169,7 @@ class Polygone{
         this.rotation += 270;
 
         this.element = new fabric.Polygon(points, {
-            //id: polygonCounter++,
+            id: Polygone.polygId++,
             type: "polygone",
             top: this.y,
             left: this.x,
@@ -225,11 +226,11 @@ class Polygone{
     drawPolygByLine(circles){
         circles.forEach((c, index) => {
             if (index == circles.length -1){
-                const line = Canvas.drawLine(c.left, c.top, circles[0].left, circles[0].top, c.originCenter);
+                const line = Canvas.drawLine(c.left, c.top, circles[0].left, circles[0].top, c.originCenter, _, circles.polygId);
                 this.lines.push(line)
             }
             else{
-                const line = Canvas.drawLine(c.left, c.top, circles[index+1].left, circles[index+1].top, c.originCenter);
+                const line = Canvas.drawLine(c.left, c.top, circles[index+1].left, circles[index+1].top, c.originCenter, _, circles.polygId);
                 this.lines.push(line)
             }
         });
@@ -357,7 +358,7 @@ class Atom{
 
     draw(){
         this.element = new fabric.Circle({
-            polygon: this.polygone.id,
+            polygId: this.polygone.id,
             originCenter: {x: this.polygone.center.x, y: this.polygone.center.y},
             type: "circle",
             left: this.x,
@@ -915,6 +916,45 @@ class Text{
         {   type: "text",
             left: this.x, 
             top: this.y,
+            fontSize: 42,
+            strokeWidth: 4,
+            cache: false,
+            originX: "center",
+            originY: "center",
+            //hasControls: false,
+            //hasBorders: false,
+        });
+        canvas.add(text);
+    }
+
+    static displayAtomName(circle, circleType){
+        let x, y;
+        switch (circleType) {
+            case "circle":
+                x = circle.left;
+                y = circle.top;
+                break;
+            case "bond":
+                const point = Canvas.getPointFromOrigin(circle.originCenter, {x:circle.left, y:circle.top}, 10)
+                x = point.x
+                y = point.y
+                break;
+        
+            default:
+                break;
+        }
+        const text = new fabric.IText('C', 
+        {   type: "atom_name",
+            left: x, 
+            top: y,
+            fontSize: 15,
+            textBackgroundColor: "white",
+            padding: '15',
+            cache: false,
+            originX: "center",
+            originY: "center",
+            hasControls: false,
+            hasBorders: false,
         });
         canvas.add(text);
     }
@@ -983,7 +1023,9 @@ class Arrow{
             strokeWidth: 2,
             originX: 'left',
             originY: 'top',
-            selectable: true
+            selectable: false,
+            hasControls: false,
+            hasBorders: false,
         });
         
         Arrow.element = pline;
@@ -1016,9 +1058,10 @@ class Canvas{
         return {x: x2, y: y2, angle: angle}
     }
 
-    static drawLine(x1, y1, x2, y2, origin = false, strokeWidth = 2){
+    static drawLine(x1, y1, x2, y2, origin = false, strokeWidth = 2, polygId){
         const angle = Canvas.getPointFromOrigin({x:x1,y:y1}, {x:x2,y:y2}, 5).angle
         const line = new fabric.Line([x1, y1, x2, y2], {
+            polygId: polygId,
             type: "line",
             stroke: 'black',
             strokeWidth: strokeWidth,
@@ -1105,12 +1148,8 @@ class Toolbar{
                 break;
 
             case "text":
-                return this.textAction(coord)
+                return this.textAction(target, coord)
                 break;
-
-            /* case "arrow":
-                return this.arrowAction(coord)
-                break; */
         
             default:
                 break;
@@ -1183,8 +1222,12 @@ class Toolbar{
         }
     }
 
-    static textAction(coord){
-        return new Text(coord.x, coord.y)
+    static textAction(target, coord=null){
+        if(target == "canvas"){
+            return new Text(coord.x, coord.y)
+        }else if(target.type == "circle" || target.type == "bond"){
+           return Text.displayAtomName(target, target.type)
+        }
     }
 
     static arrowAction(coord){
@@ -1213,18 +1256,25 @@ let isDown = false;
 canvas.on('mouse:down', function(e){
     const x = e.pointer.x
     const y = e.pointer.y
+    //text action
     if(!e.target && Toolbar.tool == "text"){
         Toolbar.action("canvas", {x, y})
-
-    }else if (e.target && Toolbar.tool !== "text"){
+    
+    }
+    //other tools action when click on a circle or square
+    else if (e.target){
         Toolbar.action(e.target)
 
-    }else if(Toolbar.tool == "arrow"){
+    }
+    //Arrow action
+    else if(Toolbar.tool == "arrow"){
         isDown = true;
         fromx = x;
         fromy = y;
 
-    }else if (!e.target){
+    }
+    //other tools action when click on void
+    else if (!e.target){
         Toolbar.action("canvas", {x, y})
     }
 });
@@ -1282,3 +1332,141 @@ document.querySelectorAll('.tool').forEach(tool => {
         Toolbar.setCurrentTool(btn)
     })
   })
+
+//Text editor events
+//change text color
+document.getElementById('text-color').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({fill: this.value})
+        canvas.requestRenderAll();
+    }
+};
+
+//const fonts = {""}
+//change font family
+document.getElementById('font-family').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set("fontFamily", this.value);
+        canvas.requestRenderAll();
+        /* var junction_font = new FontFace('3d.demo', 'url(https://fonts.googleapis.com/css2?family=Style+Script&display=swap)');
+        junction_font.load().then(function (loaded_face) 
+        {
+        console.log('loaded.font', loaded_face);
+        document['fonts'].add(loaded_face);
+        obj.set("fontFamily", '3d.demo');
+        canvas.renderAll();
+        }); */
+    }
+};
+
+//change text align
+document.getElementById('text-align').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set("textAlign", this.value);
+        canvas.requestRenderAll();
+    }
+};
+
+//change background color
+document.getElementById('text-bg-color').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({backgroundColor: this.value})
+        canvas.requestRenderAll();
+    }
+};
+
+//change text line background color
+document.getElementById('text-lines-bg-color').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({textBackgroundColor: this.value})
+        canvas.requestRenderAll();
+    }
+};
+
+//change stroke color
+document.getElementById('text-stroke-color').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({stroke: this.value})
+        canvas.requestRenderAll();
+    }
+};
+
+//change stroke width
+document.getElementById('text-stroke-width').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({strokeWidth: parseInt(this.value)})
+        canvas.requestRenderAll();
+    }
+};
+
+//change font size
+document.getElementById('text-font-size').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({fontSize: parseInt(this.value)})
+        canvas.requestRenderAll();
+    }
+};
+
+//change line height
+document.getElementById('text-line-height').onchange = function() {
+    const obj = canvas.getActiveObject()
+    if(obj && obj.type === "text"){
+        obj.set({lineHeight: parseInt(this.value)})
+        canvas.requestRenderAll();
+    }
+};
+
+//text decoration
+radios5 = document.getElementsByName("fonttype");  // wijzig naar button
+    for(var i = 0, max = radios5.length; i < max; i++) {
+        radios5[i].onclick = function() {
+            
+            if(document.getElementById(this.id).checked == true) {
+                if(this.id == "text-cmd-bold") {
+                    canvas.getActiveObject().set("fontWeight", "bold");
+                }
+                if(this.id == "text-cmd-italic") {
+                    canvas.getActiveObject().set("fontStyle", "italic");
+                }
+                if(this.id == "text-cmd-underline") {
+                    canvas.getActiveObject().set("underline", true);
+                }
+				if(this.id == "text-cmd-linethrough") {
+                    canvas.getActiveObject().set("linethrough", true);
+                }
+				if(this.id == "text-cmd-overline") {
+                    canvas.getActiveObject().set("overline", true);
+                }
+                
+                
+                
+            } else {
+                if(this.id == "text-cmd-bold") {
+                    canvas.getActiveObject().set("fontWeight", "");
+                }
+                if(this.id == "text-cmd-italic") {
+                    canvas.getActiveObject().set("fontStyle", "");
+                }  
+                if(this.id == "text-cmd-underline") {
+                    canvas.getActiveObject().set("textDecoration", "");
+                }
+				if(this.id == "text-cmd-linethrough") {
+                    canvas.getActiveObject().set("textDecoration", "");
+                }  
+                if(this.id == "text-cmd-overline") {
+                    canvas.getActiveObject().set("textDecoration", "");
+                }
+            }
+            
+            
+            canvas.renderAll();
+        }
+    }

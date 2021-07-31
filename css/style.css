@@ -39,7 +39,6 @@ li.nav-item.dropdown {
 
 .main {
     margin-top: 20px;
-    border: 2px solid;
     padding: 0;
     margin: 0 1%;
     height: 600px;
@@ -50,7 +49,7 @@ li.nav-item.dropdown {
 }
 
 .toolbar {
-    width: 200px;
+    width: 250px;
     height: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -86,4 +85,55 @@ button.toolbar img{
 .canvas-container {
     height: 600px;
     width: 100%;
+    border: 2px solid;
+    overflow: hidden;
+}
+
+div#text-wrapper {
+    font-family: 'Times New Roman', Times, serif;
+    height: 100%;
+    width: 0px;
+    overflow: hidden;
+    padding: 15px;
+    background: #e7ebee;
+    display: flex;
+    align-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.form-select{
+    width: auto;
+    max-width: 140px;
+    min-width: 100px;
+    display: inline-block;
+}
+
+div#text-controls-additional {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#bold{
+    font-weight: bold;
+}
+
+#italic{
+    font-style: italic;
+}
+
+#underline{
+    text-decoration: underline;
+}
+
+#linethrough{
+    text-decoration: line-through;
+}
+
+#overline{
+    text-decoration: overline;
 }
