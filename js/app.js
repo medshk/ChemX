@@ -293,14 +293,30 @@ class Polygone{
             const midpoint = {x: (point1.x + point2.x)/2,
                             y: (point1.y + point2.y)/2, 
                             angle: Canvas.getPointFromOrigin(point1, point2, 4).angle
-                            } 
+                            }
+            //draw circle in midpoint
+            const mp = new fabric.Circle({
+                lineId: line.lineId,
+                type: "midpoint",
+                left: midpoint.x,
+                top: midpoint.y,
+                radius: 3,
+                fill: "transparent",
+                originX: 'center',
+                originY: 'center',
+                hasControls: false,
+                hasBorders: false,
+                selectable: false
+            })
+            //draw elipse around lines
             const square = new fabric.Rect({
                 polygId: line.polygId,
+                lineId: line.lineId,
                 line: line,
                 type: 'side',
                 originCenter: this.element.center,
                 center: midpoint,
-                width: 10, 
+                width: 16, 
                 height: Polygone.sideLength + 12, 
                 left: midpoint.x + 0.5, 
                 top: midpoint.y + 0.5,
@@ -316,7 +332,7 @@ class Polygone{
                 selectable: false
             });
 
-            canvas.add(square).requestRenderAll();
+            canvas.add(square, mp).requestRenderAll();
             return square;
         })
     }
@@ -426,17 +442,22 @@ class SimpleBond{
 
     }
 
-    static drawInsidePolyg (line){
-        const p1 = {x: line.x1, y: line.y1}
-        const p2 = {x: line.x2, y: line.y2}
+    static drawInsidePolyg (target){
+        const line = target.line
+        let x1 = line.left - (line.x2 - line.x1)/2;
+        let y1 = line.top - (line.y2 - line.y1)/2;
+        let x2 = line.left + (line.x2 - line.x1)/2;
+        let y2 = line.top + (line.y2 - line.y1)/2;
+        const p1 = {x: x1, y: y1}
+        const p2 = {x: x2, y: y2}
         //coord of the new point 1
-        const x1 = Canvas.getPointFromOrigin(line.originCenter, {x: p1.x, y: p1.y}, -10).x 
-        const y1 = Canvas.getPointFromOrigin(line.originCenter, {x: p1.x, y: p1.y}, -10).y
+        x1 = Canvas.getPointFromOrigin(target.originCenter, {x: p1.x, y: p1.y}, -10).x 
+        y1 = Canvas.getPointFromOrigin(target.originCenter, {x: p1.x, y: p1.y}, -10).y
         //coord of the new point 2
-        const x2 = Canvas.getPointFromOrigin(line.originCenter, {x: p2.x, y: p2.y}, -10).x 
-        const y2 = Canvas.getPointFromOrigin(line.originCenter, {x: p2.x, y: p2.y}, -10).y
+        x2 = Canvas.getPointFromOrigin(target.originCenter, {x: p2.x, y: p2.y}, -10).x 
+        y2 = Canvas.getPointFromOrigin(target.originCenter, {x: p2.x, y: p2.y}, -10).y
   
-        return new SimpleBond({x: x1, y: y1}, {x: x2, y: y2}, false)
+        return new SimpleBond({x: x1, y: y1}, {x: x2, y: y2}, undefined, false)
     }
 
     static drawOutsidePolyg (circle){
@@ -1080,6 +1101,7 @@ class Arrow{
 
 //Canvas class: handle drawing
 class Canvas{
+    static lineId = 1;
     static getPointFromOrigin (origin, point, distance){
         const x = point.x
         const y = point.y
@@ -1103,6 +1125,7 @@ class Canvas{
         const angle = Canvas.getPointFromOrigin({x:x1,y:y1}, {x:x2,y:y2}, 5).angle
         const line = new fabric.Line([x1, y1, x2, y2], {
             polygId: polygId,
+            lineId: Canvas.lineId++,
             type: "line",
             stroke: 'black',
             strokeWidth: strokeWidth,
@@ -1277,7 +1300,7 @@ class Toolbar{
                     break;
             }
         }else if(target.type == "side"){
-            return SimpleBond.drawInsidePolyg(target.line)
+            return SimpleBond.drawInsidePolyg(target)
         }
     }
 
@@ -1298,7 +1321,6 @@ class Toolbar{
             element.selectable = true
         });
         canvas.on('selection:created',function(){
-            console.log("group")
             if (!canvas.getActiveObject()) {                  
                  return;
             }
@@ -1308,27 +1330,55 @@ class Toolbar{
         
             canvas.getActiveObject().toGroup();
             canvas.requestRenderAll();
-            console.log("grouping succesfuly");
         })  
 
+        //clear the selection
         canvas.on('selection:cleared',function(e)
         {             
             if (!canvas.getObjects()) {
                 return;
             }
-
+            //ungroup
             canvas.getObjects().forEach(function(element){
+                const centroids = {};
+                const midpoints = {};
+                const lines = {};
                 if(element.type == 'group')
                 {
                     var items = element._objects;
                     element._restoreObjectsState();
                     canvas.remove(element);
+                    //get new polygons centroid
                     for (var i = 0; i < items.length; i++) {
-                        canvas.add(items[i]);
+                        if(items[i].type === "centroid"){
+                            const centroidCoords = {x: items[i].left, y: items[i].top}
+                            const centroidId = items[i].polygId;
+                            centroids[centroidId] = centroidCoords
+                        }
+                        else if(items[i].type === "midpoint"){
+                            const midpointCoords = {x: items[i].left, y: items[i].top}
+                            const midpointId = items[i].lineId;
+                            midpoints[midpointId] = midpointCoords
+                        }
+                        else if(items[i].type === "line"){
+                            const lineId = items[i].lineId;
+                            lines[lineId] = items[i];
+                        }
                     }
-            
-
-                    console.log("ungrouping succesfuly");                                                 
+                    console.log(lines[1])
+                    //rerender group items into the canvas
+                    for (var i = 0; i < items.length; i++) {
+                        if(items[i].originCenter){
+                            const itemPolygId = items[i].polygId;
+                            items[i].originCenter = centroids[itemPolygId]
+                        }
+                        if(items[i].type === "side"){
+                            const lineId = items[i].lineId
+                            items[i].center = midpoints[lineId]
+                            items[i].line = lines[lineId]
+                        }
+                        canvas.add(items[i]);
+                    }                                           
                     canvas.requestRenderAll();
                 }
             })
@@ -1439,6 +1489,11 @@ document.querySelectorAll('.tool').forEach(tool => {
         //selection tool
         if(Toolbar.tool === "selection"){
             Toolbar.selectionAction()
+        }else{
+            //set element selectable attribute back to false
+            canvas.getObjects().forEach(function(element){
+                element.selectable = false
+            });
         }
     })
   })
