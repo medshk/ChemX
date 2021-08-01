@@ -8,6 +8,10 @@ body{
     overflow: hidden;
 }
 
+body button{
+    border: none;
+}
+
 nav{
     margin-bottom: 20px;
 }
@@ -89,25 +93,62 @@ button.toolbar img{
     overflow: hidden;
 }
 
+.text-toolbar {
+    height: 100%;
+    width: 35px;
+    overflow: hidden;
+    position: relative;
+    background: #e7ebee;
+    -webkit-transition: all 0.5s 0s ease;
+    -moz-transition: all 0.5s 0s ease;
+    -o-transition: all 0.5s 0s ease;
+    transition: all 0.5s 0s ease;
+}
+
+.text-toolbar.open{
+    width: 350px;
+}
+
+.text-toolbar .arrow-container{
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transform: rotate(180deg);
+    -webkit-transition: all 0.5s 0s ease;
+    -moz-transition: all 0.5s 0s ease;
+    -o-transition: all 0.5s 0s ease;
+    transition: all 0.5s 0s ease;
+}
+
+.text-toolbar .arrow-container.open{
+    transform: rotate(0deg);
+}
+
 div#text-wrapper {
     font-family: 'Times New Roman', Times, serif;
     height: 100%;
-    width: 0px;
+    width: 100%;
     overflow: hidden;
     padding: 15px;
-    background: #e7ebee;
-    display: flex;
+    margin-top: 15px;
+    display: none;
     align-content: center;
     flex-wrap: nowrap;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
+    -webkit-transition: all 0.5s 0s ease;
+    -moz-transition: all 0.5s 0s ease;
+    -o-transition: all 0.5s 0s ease;
+    transition: all 0.5s 0s ease;
+}
+
+div#text-wrapper.open{
+    display: flex;
 }
 
 .form-select{
-    width: auto;
-    max-width: 140px;
-    min-width: 100px;
+    width: 100px;
     display: inline-block;
 }
 

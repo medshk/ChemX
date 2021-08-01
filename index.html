@@ -114,86 +114,92 @@
         <canvas id="canvas"></canvas>
 
         
-
-        <div id="text-wrapper" ng-show="getText()">
-            <div>
-                <label for="text-color" class="form-label">Font Color: </label>
-                <input type="color" class="form-control-color" id="text-color" value="#000000" title="Choose your color">
+        <div class="text-toolbar">
+            <div class="arrow-container">
+                <button id="text-toolbar-arrow">
+                    <img src="./icons/others/arrow.svg" alt="arrow icon">
+                </button>
             </div>
-            <div>
-                <label for="font-family">Font family:</label>
-                <select id="font-family" class="form-select">
-                    <option value="Arial">Arial</option>
-                    <option value="georgia">Georgia</option>
-                    <option value="courier">Courier</option>
-                    <option value="comic sans ms">Comic Sans MS</option>
-                    <option value="impact">Impact</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="serif">Serif</option>
-                    <option value="hoefler text">Hoefler Text</option>
-                    <option value="plaster">Plaster</option>
-                    <option value="engagement">Engagement</option>
-                </select>
-            </div>
-            <div>
-                <label for="text-align">Text align:</label>
-                <select id="text-align" class="form-select">
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                    <option value="justify">Justify</option>
-                </select>
-            </div>
-            <div>
-                <label for="text-bg-color" class="form-label">Background color: </label>
-                <input type="color" class="form-control-color" id="text-bg-color" value="#ffffff" title="Choose your color">
-            </div>
-            <div>
-                <label for="text-lines-bg-color" class="form-label">Background text color: </label>
-                <input type="color" class="form-control-color" id="text-lines-bg-color" value="#ffffff" title="Choose your color">
-            </div>
-            <div>
-                <label for="text-stroke-color" class="form-label">Stroke color: </label>
-                <input type="color" class="form-control-color" id="text-stroke-color" value="#000000" title="Choose your color">
-            </div>
-            <div>
-                <label for="text-stroke-width" class="form-label">Stroke width: </label>
-                <input type="range" class="form-range" value="4" min="0" max="20" step="2" id="text-stroke-width">
-            </div>
-            <div>
-                <label for="text-font-size" class="form-label">Font size: </label>
-                <input type="range" class="form-range" value="42" min="1" max="120" step="2" id="text-font-size">
-            </div>
-            <div>
-                <label for="text-line-height" class="form-label">Line height: </label>
-                <input type="range" class="form-range" value="1" min="1" max="10" step="1" id="text-line-height">
-            </div>
-            <div id="text-controls-additional">
+            <div id="text-wrapper" ng-show="getText()">
                 <div>
-                    <label class="form-check-label" for="text-cmd-bold" id="bold">B</label>
-                    <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-bold">
+                    <label for="text-color" class="form-label">Font Color: </label>
+                    <input type="color" class="form-control-color" id="text-color" value="#000000" title="Choose your color">
                 </div>
-            
                 <div>
-                    <label class="form-check-label" for="text-cmd-italic" id="italic">I</label>
-                    <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-italic">
+                    <label for="font-family">Font family:</label>
+                    <select id="font-family" class="form-select">
+                        <option value="Arial">Arial</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="courier">Courier</option>
+                        <option value="comic sans ms">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="serif">Serif</option>
+                        <option value="hoefler text">Hoefler Text</option>
+                        <option value="plaster">Plaster</option>
+                        <option value="engagement">Engagement</option>
+                    </select>
                 </div>
+                <div>
+                    <label for="text-align">Text align:</label>
+                    <select id="text-align" class="form-select">
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
+                        <option value="justify">Justify</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="text-bg-color" class="form-label">Background color: </label>
+                    <input type="color" class="form-control-color" id="text-bg-color" value="#ffffff" title="Choose your color">
+                </div>
+                <div>
+                    <label for="text-lines-bg-color" class="form-label">Background text color: </label>
+                    <input type="color" class="form-control-color" id="text-lines-bg-color" value="#ffffff" title="Choose your color">
+                </div>
+                <div>
+                    <label for="text-stroke-color" class="form-label">Stroke color: </label>
+                    <input type="color" class="form-control-color" id="text-stroke-color" value="#000000" title="Choose your color">
+                </div>
+                <div>
+                    <label for="text-stroke-width" class="form-label">Stroke width: </label>
+                    <input type="range" class="form-range" value="4" min="0" max="20" step="2" id="text-stroke-width">
+                </div>
+                <div>
+                    <label for="text-font-size" class="form-label">Font size: </label>
+                    <input type="range" class="form-range" value="42" min="1" max="120" step="2" id="text-font-size">
+                </div>
+                <div>
+                    <label for="text-line-height" class="form-label">Line height: </label>
+                    <input type="range" class="form-range" value="1" min="1" max="10" step="1" id="text-line-height">
+                </div>
+                <div id="text-controls-additional">
+                    <div>
+                        <label class="form-check-label" for="text-cmd-bold" id="bold">B</label>
+                        <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-bold">
+                    </div>
                 
-                <div>
-                    <label class="form-check-label" for="text-cmd-underline" id="underline">U</label>
-                    <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-underline">
+                    <div>
+                        <label class="form-check-label" for="text-cmd-italic" id="italic">I</label>
+                        <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-italic">
+                    </div>
+                    
+                    <div>
+                        <label class="form-check-label" for="text-cmd-underline" id="underline">U</label>
+                        <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-underline">
+                    </div>
+    
+                    <div>
+                        <label class="form-check-label" for="text-cmd-linethrough" id="linethrough">LT</label>
+                        <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-linethrough">
+                    </div>
+                    
+                    <div>
+                        <label class="form-check-label" for="text-cmd-overline" id="overline">O</label>
+                        <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-overline">
+                    </div>
+                    
                 </div>
-
-                <div>
-                    <label class="form-check-label" for="text-cmd-linethrough" id="linethrough">LT</label>
-                    <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-linethrough">
-                </div>
-                
-                <div>
-                    <label class="form-check-label" for="text-cmd-overline" id="overline">O</label>
-                    <input type='checkbox' class="form-check-input" name='fonttype' id="text-cmd-overline">
-                </div>
-                
             </div>
         </div>
         

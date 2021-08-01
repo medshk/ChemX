@@ -1065,8 +1065,8 @@ class Arrow{
             originX: 'left',
             originY: 'top',
             selectable: false,
-            hasControls: false,
-            hasBorders: false,
+            //hasControls: false,
+            //hasBorders: false,
         });
         
         Arrow.element = pline;
@@ -1444,6 +1444,13 @@ document.querySelectorAll('.tool').forEach(tool => {
   })
 
 //Text editor events
+//show the toolbar
+document.querySelector('#text-toolbar-arrow').addEventListener('click', (e)=>{
+    document.querySelector('.text-toolbar').classList.toggle("open");
+    document.querySelector('#text-wrapper').classList.toggle("open");
+    document.querySelector(".arrow-container").classList.toggle("open");
+})
+
 //change text color
 document.getElementById('text-color').onchange = function() {
     const obj = canvas.getActiveObject()
