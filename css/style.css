@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico|VT323|Quicksand|Inconsolata|Tangerine|Palette Mosaic|MonteCarlo');
 *{
     padding: 0;
     margin: 0;
@@ -60,7 +61,6 @@ li.nav-item.dropdown {
     align-content: center;
     justify-content: center;
     align-items: center;
-    /* background: #0d6efd7a; */
     background: rgb(86,81,159);
     background: linear-gradient(184deg, rgba(86,81,159,1) 22%, rgba(113,113,255,1) 65%, rgba(60,108,249,0.6786064767703957) 100%);
     overflow: auto;
@@ -148,7 +148,7 @@ div#text-wrapper.open{
 }
 
 .form-select{
-    width: 100px;
+    width: 120px;
     display: inline-block;
 }
 

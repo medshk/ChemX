@@ -442,8 +442,8 @@ class SimpleBond{
 
     }
 
-    static drawInsidePolyg (target){
-        const line = target.line
+    static drawInsidePolyg (line){
+        //always get the current coords even after moving
         let x1 = line.left - (line.x2 - line.x1)/2;
         let y1 = line.top - (line.y2 - line.y1)/2;
         let x2 = line.left + (line.x2 - line.x1)/2;
@@ -451,11 +451,11 @@ class SimpleBond{
         const p1 = {x: x1, y: y1}
         const p2 = {x: x2, y: y2}
         //coord of the new point 1
-        x1 = Canvas.getPointFromOrigin(target.originCenter, {x: p1.x, y: p1.y}, -10).x 
-        y1 = Canvas.getPointFromOrigin(target.originCenter, {x: p1.x, y: p1.y}, -10).y
+        x1 = Canvas.getPointFromOrigin(line.originCenter, {x: p1.x, y: p1.y}, -10).x 
+        y1 = Canvas.getPointFromOrigin(line.originCenter, {x: p1.x, y: p1.y}, -10).y
         //coord of the new point 2
-        x2 = Canvas.getPointFromOrigin(target.originCenter, {x: p2.x, y: p2.y}, -10).x 
-        y2 = Canvas.getPointFromOrigin(target.originCenter, {x: p2.x, y: p2.y}, -10).y
+        x2 = Canvas.getPointFromOrigin(line.originCenter, {x: p2.x, y: p2.y}, -10).x 
+        y2 = Canvas.getPointFromOrigin(line.originCenter, {x: p2.x, y: p2.y}, -10).y
   
         return new SimpleBond({x: x1, y: y1}, {x: x2, y: y2}, undefined, false)
     }
@@ -1193,6 +1193,13 @@ class Canvas{
         })
         canvas.add(circle).requestRenderAll()
     }
+
+    //get midpoint of 2 points
+    static getMidpoint(point1, point2){
+        return {x: (point1.x + point2.x)/2,
+                y: (point1.y + point2.y)/2,
+                }
+    }
 }
 
 //Toolbar class:
@@ -1300,7 +1307,7 @@ class Toolbar{
                     break;
             }
         }else if(target.type == "side"){
-            return SimpleBond.drawInsidePolyg(target)
+            return SimpleBond.drawInsidePolyg(target.line)
         }
     }
 
@@ -1365,7 +1372,6 @@ class Toolbar{
                             lines[lineId] = items[i];
                         }
                     }
-                    console.log(lines[1])
                     //rerender group items into the canvas
                     for (var i = 0; i < items.length; i++) {
                         if(items[i].originCenter){
@@ -1454,10 +1460,6 @@ canvas.on("mouse:up", function(e){
     if(Toolbar.tool === "arrow"){
         Arrow.element = null
     }
-
-    /* canvas.getObjects().forEach(function(element){
-        console.log(element.type, element.polygId)
-    });  */
 })
 
 //EVENT: Canvas hover
@@ -1643,3 +1645,8 @@ radios5 = document.getElementsByName("fonttype");  // wijzig naar button
         }
     }
 
+
+//change font select options font family
+Array.from(document.querySelector("#font-family").options).forEach(function(option) {
+    option.style.fontFamily = `${option.value}, sans-serif`
+});
