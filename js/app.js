@@ -1324,6 +1324,7 @@ class Toolbar{
     }
 
     static selectionAction(){
+        canvas.selection = true;
         canvas.getObjects().forEach(function(element){
             element.selectable = true
         });
@@ -1400,6 +1401,44 @@ class Toolbar{
 const canvas = new fabric.Canvas('canvas');
 canvas.setDimensions({width: 1500, height: 600});
 canvas.hoverCursor = 'pointer';
+canvas.selection = false;
+
+/* canvas.on('object:added',function(){
+    if(!isRedoing){
+        let objects = canvas._objects
+        h.push(objects);
+        count++;
+        console.log(h)
+    }
+    isRedoing = false;
+  });
+  
+  var isRedoing = false;
+  var h = [];
+  let count = 0;
+  
+  function undo(){
+      console.log(canvas._objects.length)
+      if(canvas._objects.length>0){
+          //h.push(canvas._objects.pop());
+     h[count-1].forEach(object => {
+        canvas._objects.pop()
+        canvas.requestRenderAll();
+     })
+     console.log(canvas._objects.length)
+    }
+  }
+  function redo(){
+    
+    if(h.length>0){
+      isRedoing = true;
+     canvas.add(h.pop());
+     canvas.requestRenderAll();
+
+    }
+  }
+
+  document.querySelector("#undo").addEventListener('click', undo); */
 
 //set default tool
 const toolBtn = document.querySelector('.tool.active');
@@ -1460,6 +1499,7 @@ canvas.on("mouse:up", function(e){
     if(Toolbar.tool === "arrow"){
         Arrow.element = null
     }
+    saveState()
 })
 
 //EVENT: Canvas hover
@@ -1496,6 +1536,7 @@ document.querySelectorAll('.tool').forEach(tool => {
             canvas.getObjects().forEach(function(element){
                 element.selectable = false
             });
+            canvas.selection = false;
         }
     })
   })
@@ -1650,3 +1691,66 @@ radios5 = document.getElementsByName("fonttype");  // wijzig naar button
 Array.from(document.querySelector("#font-family").options).forEach(function(option) {
     option.style.fontFamily = `${option.value}, sans-serif`
 });
+
+
+
+const redoBtn = document.querySelector("#redo")
+const undoBtn = document.querySelector("#undo")
+
+const redoStack = []
+const undoStack = []
+const circle = new fabric.Circle({
+    left: 100,
+    top: 100,
+    radius: 50,
+    selectable: false,
+    fill: "red"
+})
+const circle2 = new fabric.Circle({
+    left: 200,
+    top: 200,
+    radius: 50,
+    selectable: false,
+    fill: "green"
+})
+canvas.add(circle, circle2).requestRenderAll();
+saveState();
+
+function saveState() {
+    
+    undoStack.push(JSON.stringify(canvas))
+    //undoStack.push(canvas.toSVG())
+    
+}
+
+function deserialize(state){
+    canvas.clear();
+    canvas.loadFromJSON(state, CallBack, function(o, object) {
+        canvas.setActiveObject(object);
+    });
+    /* fabric.loadSVGFromString(state, function(objects, options) {
+        var obj = fabric.util.groupSVGElements(objects, options);
+        canvas.add(obj).renderAll();
+      }); */
+}
+function CallBack() {
+    canvas.renderAll();
+    canvas.calcOffset();
+}
+
+function undo() {
+    const state = undoStack[undoStack.length -1];
+    deserialize(state)
+    redoStack.push(state)
+    undoStack.pop();
+}
+
+function redo() {
+    const state = redoStack[redoStack.length -1];
+    deserialize(state)
+    undoStack.push(state)
+    redoStack.pop();
+}
+
+undoBtn.addEventListener('click', undo)
+redoBtn.addEventListener('click', redo)
