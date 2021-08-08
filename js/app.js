@@ -1,13 +1,14 @@
 //Polygone: class
+//name
 class Polygone{
     static sideLength = 30;
     static radius = null;
     static polygId = 1;
 
-    constructor(x, y, type, rotation=0){
+    constructor(x, y, name, rotation=0){
         this.x = x;
         this.y = y;
-        this.type = type;
+        this.name = name;
         this.rotation = rotation;
         this.bonds = [];
         this.atoms = [];
@@ -17,8 +18,8 @@ class Polygone{
     }
 
 
-    static getNbrSides(type){
-        switch (type) {
+    static getNbrSides(name){
+        switch (name) {
             case "benzene":
                 return 6
                 break;
@@ -44,7 +45,7 @@ class Polygone{
     }
 
     draw(){        
-        switch (this.type) {
+        switch (this.name) {
             case "benzene":
                 this.drawBenzene()
                 break;
@@ -60,7 +61,7 @@ class Polygone{
 
     //Polygone method without bonds inside
     drawSimplePolygone(){
-        const nbrSides = Polygone.getNbrSides(this.type)
+        const nbrSides = Polygone.getNbrSides(this.name)
         let radius = Polygone.radius;
         switch (nbrSides) {
         case 6:
@@ -81,7 +82,7 @@ class Polygone{
 
         this.element = new fabric.Polygon(points, {
             id: Polygone.polygId,
-            type: "polygone",
+            name: "polygone",
             top: this.y,
             left: this.x,
             fill: '',
@@ -116,14 +117,14 @@ class Polygone{
 
     //Benzene method: hexagone(6) with bonds inside
     drawBenzene(){
-        const nbrSides = Polygone.getNbrSides(this.type)
+        const nbrSides = Polygone.getNbrSides(this.name)
         const points = this.regularPolygonPoints(nbrSides, Polygone.radius)
 
         this.rotation += 30;
 
         this.element = new fabric.Polygon(points, {
             id: Polygone.polygId,
-            type: "polygone",
+            name: "polygone",
             top: this.y,
             left: this.x,
             fill: '',
@@ -167,14 +168,14 @@ class Polygone{
 
     //Cyclopentadiene method: pentagone(5) with bonds inside
     drawCyclopentadiene(){
-        const nbrSides = Polygone.getNbrSides(this.type)
+        const nbrSides = Polygone.getNbrSides(this.name)
         const points = this.regularPolygonPoints(nbrSides, Polygone.radius)
 
         this.rotation += 270;
 
         this.element = new fabric.Polygon(points, {
             id: Polygone.polygId,
-            type: "polygone",
+            name: "polygone",
             top: this.y,
             left: this.x,
             fill: '',
@@ -297,7 +298,7 @@ class Polygone{
             //draw circle in midpoint
             const mp = new fabric.Circle({
                 lineId: line.lineId,
-                type: "midpoint",
+                name: "midpoint",
                 left: midpoint.x,
                 top: midpoint.y,
                 radius: 3,
@@ -313,7 +314,7 @@ class Polygone{
                 polygId: line.polygId,
                 lineId: line.lineId,
                 line: line,
-                type: 'side',
+                name: 'side',
                 originCenter: this.element.center,
                 center: midpoint,
                 width: 16, 
@@ -337,8 +338,8 @@ class Polygone{
         })
     }
 
-    static draw2(circle, type){
-        const nbrSides = Polygone.getNbrSides(type)
+    static draw2(circle, name){
+        const nbrSides = Polygone.getNbrSides(name)
         let angle = 0;
         let originRadius = Polygone.radius;
         switch (nbrSides) {
@@ -365,7 +366,7 @@ class Polygone{
   
         const polygOrigin = Canvas.getPointFromOrigin(bondOrigin, {x: x2, y: y2}, originRadius)//5: rad-5, 3:rad-7
   
-        return new Polygone(polygOrigin.x, polygOrigin.y, type, polygOrigin.angle + angle) //5:angle+180 / 3:angle+90
+        return new Polygone(polygOrigin.x, polygOrigin.y, name, polygOrigin.angle + angle) //5:angle+180 / 3:angle+90
     }
 }
 
@@ -383,7 +384,7 @@ class Atom{
         this.element = new fabric.Circle({
             polygId: this.polygone.id,
             originCenter: {x: this.polygone.center.x, y: this.polygone.center.y},
-            type: "circle",
+            name: "circle",
             left: this.x,
             top: this.y,
             radius: 10,
@@ -424,7 +425,7 @@ class SimpleBond{
         const circle = new fabric.Circle({
             polygId: this.polygId,
             originCenter: this.point1.origin,
-            type: "bond",
+            name: "bond",
             left: this.point2.x,
             top: this.point2.y,
             radius: 10,
@@ -620,7 +621,7 @@ class DoubleBond{
         this.line2 = line2
 
         let group = new fabric.Group([line1, line2],{
-            type: "bond_group",
+            name: "bond_group",
             polygId: this.polygId
         })
         
@@ -682,7 +683,7 @@ class DoubleBond{
         const circle = new fabric.Circle({
             polygId: this.polygId,
             originCenter: originCenter,
-            type: "bond",
+            name: "bond",
             left: coord.x,
             top: coord.y,
             radius: 10,
@@ -751,7 +752,7 @@ class HashedWedgedBond{
         });
 
         const group = new fabric.Group([...lines],{
-            type: "bond_group",
+            name: "bond_group",
             polygId: this.polygId
         })
         canvas.add(group).requestRenderAll()
@@ -773,7 +774,7 @@ class HashedWedgedBond{
         const circle = new fabric.Circle({
             polygId: this.polygId,
             originCenter: originCenter,
-            type: "bond",
+            name: "bond",
             left: coord.x,
             top: coord.y,
             radius: 10,
@@ -845,7 +846,7 @@ class WedgedBond{
 
     draw(){
         const triangle = new fabric.Polygon(this.points, {
-            type:"line",
+            name:"line",
             polygId: this.polygId,
             fill: 'black',
             stroke: 'black',
@@ -868,7 +869,7 @@ class WedgedBond{
         const circle = new fabric.Circle({
             polygId: this.polygId,
             originCenter: originCenter,
-            type: "bond",
+            name: "bond",
             left: coord.x,
             top: coord.y,
             radius: 10,
@@ -923,7 +924,7 @@ class HollowBond extends WedgedBond{
 
     draw(){
         const triangle = new fabric.Polygon(this.points, {
-            type:"line",
+            name:"line",
             polygId: this.polygId,
             fill: '',
             stroke: 'black',
@@ -975,7 +976,7 @@ class Text{
 
     display(){
         const text = new fabric.IText('Text', 
-        {   type: "text",
+        {   name: "text",
             left: this.x, 
             top: this.y,
             fontSize: 42,
@@ -1006,7 +1007,7 @@ class Text{
                 break;
         }
         const text = new fabric.IText('C', 
-        {   type: "atom_name",
+        {   name: "atom_name",
             left: x, 
             top: y,
             fontSize: 15,
@@ -1099,6 +1100,90 @@ class Arrow{
     
 }
 
+//class Undo and redo
+class UndoRedo{
+    static redoStack = []
+    static undoStack = []
+
+    static saveState() { 
+        const objectsToStore = []
+        const objs = canvas.getObjects()
+        objs.forEach(o => {
+            const objClone = fabric.util.object.clone(o);
+            objectsToStore.push(objClone)
+        })
+        const lastState = UndoRedo.undoStack[UndoRedo.undoStack.length - 1] == undefined ? [] : UndoRedo.undoStack[UndoRedo.undoStack.length - 1];
+        if(!Canvas.arraysEqual(objectsToStore, lastState) && lastState){
+            UndoRedo.undoStack.push(objectsToStore)
+        }
+        
+        console.log("undo",UndoRedo.undoStack)
+        
+        //UndoRedo.undoStack.push(JSON.stringify(canvas))
+        //UndoRedo.undoStack.push(canvas.toSVG())
+        
+    }
+
+    static deserialize(state){
+        canvas.clear();
+        state.forEach(obj => {
+            canvas.add(obj)
+        })
+        //canvas.requestRenderAll()
+    /*     canvas.loadFromJSON(state, function ()
+    {
+        canvas.renderAll();
+        console.log(JSON.stringify(canvas));
+        var json = canvas.toJSON(['selectable', 'name', 'midpoint', 'line', 'center','hasControls', 'hasBorders']);
+        console.log(JSON.stringify(json))
+    }); */
+
+
+        //canvas.clear();
+        //canvas.loadFromJSON(state)
+        /* canvas.loadFromJSON(state, CallBack, function(o, object) {
+            canvas.setActiveObject(object);
+        }); */
+        /* fabric.loadSVGFromString(state, function(objects, options) {
+            var obj = fabric.util.groupSVGElements(objects, options);
+            canvas.add(obj).renderAll();
+        }); */
+    }
+
+    static undo() {
+        const toRedo = UndoRedo.undoStack[UndoRedo.undoStack.length - 1]; //state to push into the redo stack
+        const toShow = UndoRedo.undoStack[UndoRedo.undoStack.length - 2]; //state to UndoRedo.deserialize
+        console.log("to show", toShow)
+        if(toShow){
+            UndoRedo.deserialize(toShow)
+            UndoRedo.redoStack.push(toRedo)
+            UndoRedo.undoStack.pop();
+        }
+        //alwas keep selectable attrubite to true the selected tool is the selection
+        if(Toolbar.tool === "selection"){
+            console.log("selection")
+            Canvas.setSelectable(true)
+        }
+        console.log("redo", UndoRedo.redoStack)
+    }
+
+    static redo() {
+        const toUndo = UndoRedo.redoStack[UndoRedo.redoStack.length - 1];
+        const toShow = UndoRedo.redoStack[UndoRedo.redoStack.length - 1];
+        console.log("to show", toShow)
+        if(toShow){
+            UndoRedo.deserialize(toShow)
+            UndoRedo.undoStack.push(toUndo)
+            UndoRedo.redoStack.pop();
+        }
+        //alwas keep selectable attrubite to true the selected tool is the selection
+        if(Toolbar.tool === "selection"){
+            Canvas.setSelectable(true)
+        }
+        console.log("undo", UndoRedo.undoStack)
+    }
+}
+
 //Canvas class: handle drawing
 class Canvas{
     static lineId = 1;
@@ -1126,7 +1211,7 @@ class Canvas{
         const line = new fabric.Line([x1, y1, x2, y2], {
             polygId: polygId,
             lineId: Canvas.lineId++,
-            type: "line",
+            name: "line",
             stroke: 'black',
             strokeWidth: strokeWidth,
             lineAngle: angle,
@@ -1170,8 +1255,8 @@ class Canvas{
     }
 
     //calc apothem (distance between origin center and side midpoint)
-    static getApothem(type){
-        const nbrSides = Polygone.getNbrSides(type)
+    static getApothem(name){
+        const nbrSides = Polygone.getNbrSides(name)
         const r = Polygone.radius * Math.cos(Math.PI / nbrSides)
         return r
     }
@@ -1179,7 +1264,7 @@ class Canvas{
     //draw circle in centroid
     static drawCentroid(centroid, polygId){
         const circle = new fabric.Circle({
-            type: "centroid",
+            name: "centroid",
             polygId: polygId,
             left: centroid.x,
             top: centroid.y,
@@ -1199,6 +1284,23 @@ class Canvas{
         return {x: (point1.x + point2.x)/2,
                 y: (point1.y + point2.y)/2,
                 }
+    }
+
+    //check if two objects are equal
+    static objectsEqual(o1, o2){
+        return Object.keys(o1).length === Object.keys(o2).length 
+        && Object.keys(o1).every(p => o1[p] === o2[p]);
+    }
+
+    // Compare Object Arrays
+    static arraysEqual(a1, a2){
+        return a1.length === a2.length && a1.every((o, idx) => Canvas.objectsEqual(o, a2[idx]));
+    }
+
+    static setSelectable(bool){
+        canvas.getObjects().forEach(function(element){
+            element.selectable = bool
+        });
     }
 }
 
@@ -1246,7 +1348,7 @@ class Toolbar{
     }
 
     static polygoneAction(target){
-        switch (target.type) {
+        switch (target.name) {
             case "circle":
                 const bond = SimpleBond.drawOutsidePolyg(target)
                 return Polygone.draw2(bond.circle, this.toolType)
@@ -1276,7 +1378,7 @@ class Toolbar{
     }
 
     static BondAction(target){
-        if(target.type == "circle"){
+        if(target.name == "circle"){
             switch (Toolbar.toolType) {
                 case "simple":
                     return SimpleBond.drawOutsidePolyg(target)
@@ -1306,7 +1408,7 @@ class Toolbar{
                 default:
                     break;
             }
-        }else if(target.type == "side"){
+        }else if(target.name == "side"){
             return SimpleBond.drawInsidePolyg(target.line)
         }
     }
@@ -1314,8 +1416,8 @@ class Toolbar{
     static textAction(target, coord=null){
         if(target == "canvas"){
             return new Text(coord.x, coord.y)
-        }else if(target.type == "circle" || target.type == "bond"){
-           return Text.displayAtomName(target, target.type)
+        }else if(target.name == "circle" || target.name == "bond"){
+           return Text.displayAtomName(target, target.name)
         }
     }
 
@@ -1325,9 +1427,9 @@ class Toolbar{
 
     static selectionAction(){
         canvas.selection = true;
-        canvas.getObjects().forEach(function(element){
-            element.selectable = true
-        });
+        //set elements selectable attributes to true
+        Canvas.setSelectable(true)
+
         canvas.on('selection:created',function(){
             if (!canvas.getActiveObject()) {                  
                  return;
@@ -1358,17 +1460,17 @@ class Toolbar{
                     canvas.remove(element);
                     //get new polygons centroid
                     for (var i = 0; i < items.length; i++) {
-                        if(items[i].type === "centroid"){
+                        if(items[i].name === "centroid"){
                             const centroidCoords = {x: items[i].left, y: items[i].top}
                             const centroidId = items[i].polygId;
                             centroids[centroidId] = centroidCoords
                         }
-                        else if(items[i].type === "midpoint"){
+                        else if(items[i].name === "midpoint"){
                             const midpointCoords = {x: items[i].left, y: items[i].top}
                             const midpointId = items[i].lineId;
                             midpoints[midpointId] = midpointCoords
                         }
-                        else if(items[i].type === "line"){
+                        else if(items[i].name === "line"){
                             const lineId = items[i].lineId;
                             lines[lineId] = items[i];
                         }
@@ -1379,7 +1481,7 @@ class Toolbar{
                             const itemPolygId = items[i].polygId;
                             items[i].originCenter = centroids[itemPolygId]
                         }
-                        if(items[i].type === "side"){
+                        if(items[i].name === "side"){
                             const lineId = items[i].lineId
                             items[i].center = midpoints[lineId]
                             items[i].line = lines[lineId]
@@ -1388,6 +1490,7 @@ class Toolbar{
                     }                                           
                     canvas.requestRenderAll();
                 }
+                UndoRedo.saveState()
             })
         })
     }
@@ -1402,6 +1505,9 @@ const canvas = new fabric.Canvas('canvas');
 canvas.setDimensions({width: 1500, height: 600});
 canvas.hoverCursor = 'pointer';
 canvas.selection = false;
+
+//save state for undo/redo
+UndoRedo.saveState();
 
 /* canvas.on('object:added',function(){
     if(!isRedoing){
@@ -1455,12 +1561,14 @@ canvas.on('mouse:down', function(e){
     //text action
     if(!e.target && Toolbar.tool == "text"){
         Toolbar.action("canvas", {x, y})
-    
+        UndoRedo.saveState();
     }
     //other tools action when click on a circle or square
     else if (e.target){
         Toolbar.action(e.target)
-
+        if(Toolbar.tool !== "selection"){
+            UndoRedo.saveState();
+        }
     }
     //Arrow action
     else if(Toolbar.tool == "arrow"){
@@ -1472,6 +1580,9 @@ canvas.on('mouse:down', function(e){
     //other tools action when click on void
     else if (!e.target){
         Toolbar.action("canvas", {x, y})
+        if(Toolbar.tool !== "selection"){
+            UndoRedo.saveState();
+        }
     }
 });
 
@@ -1498,23 +1609,26 @@ canvas.on("mouse:up", function(e){
     isDown = false;
     if(Toolbar.tool === "arrow"){
         Arrow.element = null
+        UndoRedo.saveState()
     }
-    saveState()
 })
 
 //EVENT: Canvas hover
 canvas.on('mouse:over', function(e){
-    if (e.target && (e.target.type == "circle" || e.target.type == "bond" || e.target.type == "side")){
+    if (e.target && (e.target.name == "circle" || e.target.name == "bond" || e.target.name == "side")){
         Canvas.setBorderColor(e.target)
     }
 })
 
 //EVENT: canvas hover out
 canvas.on('mouse:out', function(e){
-    if (e.target && (e.target.type == "circle" || e.target.type == "bond" || e.target.type == "side") ){
+    if (e.target && (e.target.name == "circle" || e.target.name == "bond" || e.target.name == "side") ){
         Canvas.setBorderColorToDefault(e.target)
     }
 })
+
+//EVENT: object modified
+//canvas.on("object:modified", UndoRedo.saveState)
 
 
 //Toolbar events
@@ -1552,7 +1666,7 @@ document.querySelector('#text-toolbar-arrow').addEventListener('click', (e)=>{
 //change text color
 document.getElementById('text-color').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({fill: this.value})
         canvas.requestRenderAll();
     }
@@ -1562,7 +1676,7 @@ document.getElementById('text-color').onchange = function() {
 //change font family
 document.getElementById('font-family').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set("fontFamily", this.value);
         canvas.requestRenderAll();
         /* var junction_font = new FontFace('3d.demo', 'url(https://fonts.googleapis.com/css2?family=Style+Script&display=swap)');
@@ -1579,7 +1693,7 @@ document.getElementById('font-family').onchange = function() {
 //change text align
 document.getElementById('text-align').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set("textAlign", this.value);
         canvas.requestRenderAll();
     }
@@ -1588,7 +1702,7 @@ document.getElementById('text-align').onchange = function() {
 //change background color
 document.getElementById('text-bg-color').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({backgroundColor: this.value})
         canvas.requestRenderAll();
     }
@@ -1597,7 +1711,7 @@ document.getElementById('text-bg-color').onchange = function() {
 //change text line background color
 document.getElementById('text-lines-bg-color').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({textBackgroundColor: this.value})
         canvas.requestRenderAll();
     }
@@ -1606,7 +1720,7 @@ document.getElementById('text-lines-bg-color').onchange = function() {
 //change stroke color
 document.getElementById('text-stroke-color').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({stroke: this.value})
         canvas.requestRenderAll();
     }
@@ -1615,7 +1729,7 @@ document.getElementById('text-stroke-color').onchange = function() {
 //change stroke width
 document.getElementById('text-stroke-width').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({strokeWidth: parseInt(this.value)})
         canvas.requestRenderAll();
     }
@@ -1624,7 +1738,7 @@ document.getElementById('text-stroke-width').onchange = function() {
 //change font size
 document.getElementById('text-font-size').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({fontSize: parseInt(this.value)})
         canvas.requestRenderAll();
     }
@@ -1633,7 +1747,7 @@ document.getElementById('text-font-size').onchange = function() {
 //change line height
 document.getElementById('text-line-height').onchange = function() {
     const obj = canvas.getActiveObject()
-    if(obj && obj.type === "text"){
+    if(obj && obj.name === "text"){
         obj.set({lineHeight: parseInt(this.value)})
         canvas.requestRenderAll();
     }
@@ -1641,50 +1755,50 @@ document.getElementById('text-line-height').onchange = function() {
 
 //text decoration
 radios5 = document.getElementsByName("fonttype");  // wijzig naar button
-    for(var i = 0, max = radios5.length; i < max; i++) {
-        radios5[i].onclick = function() {
-            
-            if(document.getElementById(this.id).checked == true) {
-                if(this.id == "text-cmd-bold") {
-                    canvas.getActiveObject().set("fontWeight", "bold");
-                }
-                if(this.id == "text-cmd-italic") {
-                    canvas.getActiveObject().set("fontStyle", "italic");
-                }
-                if(this.id == "text-cmd-underline") {
-                    canvas.getActiveObject().set("underline", true);
-                }
-				if(this.id == "text-cmd-linethrough") {
-                    canvas.getActiveObject().set("linethrough", true);
-                }
-				if(this.id == "text-cmd-overline") {
-                    canvas.getActiveObject().set("overline", true);
-                }
-                
-                
-                
-            } else {
-                if(this.id == "text-cmd-bold") {
-                    canvas.getActiveObject().set("fontWeight", "");
-                }
-                if(this.id == "text-cmd-italic") {
-                    canvas.getActiveObject().set("fontStyle", "");
-                }  
-                if(this.id == "text-cmd-underline") {
-                    canvas.getActiveObject().set("textDecoration", "");
-                }
-				if(this.id == "text-cmd-linethrough") {
-                    canvas.getActiveObject().set("textDecoration", "");
-                }  
-                if(this.id == "text-cmd-overline") {
-                    canvas.getActiveObject().set("textDecoration", "");
-                }
+for(var i = 0, max = radios5.length; i < max; i++) {
+    radios5[i].onclick = function() {
+        
+        if(document.getElementById(this.id).checked == true) {
+            if(this.id == "text-cmd-bold") {
+                canvas.getActiveObject().set("fontWeight", "bold");
+            }
+            if(this.id == "text-cmd-italic") {
+                canvas.getActiveObject().set("fontStyle", "italic");
+            }
+            if(this.id == "text-cmd-underline") {
+                canvas.getActiveObject().set("underline", true);
+            }
+            if(this.id == "text-cmd-linethrough") {
+                canvas.getActiveObject().set("linethrough", true);
+            }
+            if(this.id == "text-cmd-overline") {
+                canvas.getActiveObject().set("overline", true);
             }
             
             
-            canvas.renderAll();
+            
+        } else {
+            if(this.id == "text-cmd-bold") {
+                canvas.getActiveObject().set("fontWeight", "");
+            }
+            if(this.id == "text-cmd-italic") {
+                canvas.getActiveObject().set("fontStyle", "");
+            }  
+            if(this.id == "text-cmd-underline") {
+                canvas.getActiveObject().set("textDecoration", "");
+            }
+            if(this.id == "text-cmd-linethrough") {
+                canvas.getActiveObject().set("textDecoration", "");
+            }  
+            if(this.id == "text-cmd-overline") {
+                canvas.getActiveObject().set("textDecoration", "");
+            }
         }
+        
+        
+        canvas.renderAll();
     }
+}
 
 
 //change font select options font family
@@ -1693,64 +1807,10 @@ Array.from(document.querySelector("#font-family").options).forEach(function(opti
 });
 
 
-
+///////////////////////NAVBAR MENU ////////////////////////
+//undo & redo
 const redoBtn = document.querySelector("#redo")
 const undoBtn = document.querySelector("#undo")
 
-const redoStack = []
-const undoStack = []
-const circle = new fabric.Circle({
-    left: 100,
-    top: 100,
-    radius: 50,
-    selectable: false,
-    fill: "red"
-})
-const circle2 = new fabric.Circle({
-    left: 200,
-    top: 200,
-    radius: 50,
-    selectable: false,
-    fill: "green"
-})
-canvas.add(circle, circle2).requestRenderAll();
-saveState();
-
-function saveState() {
-    
-    undoStack.push(JSON.stringify(canvas))
-    //undoStack.push(canvas.toSVG())
-    
-}
-
-function deserialize(state){
-    canvas.clear();
-    canvas.loadFromJSON(state, CallBack, function(o, object) {
-        canvas.setActiveObject(object);
-    });
-    /* fabric.loadSVGFromString(state, function(objects, options) {
-        var obj = fabric.util.groupSVGElements(objects, options);
-        canvas.add(obj).renderAll();
-      }); */
-}
-function CallBack() {
-    canvas.renderAll();
-    canvas.calcOffset();
-}
-
-function undo() {
-    const state = undoStack[undoStack.length -1];
-    deserialize(state)
-    redoStack.push(state)
-    undoStack.pop();
-}
-
-function redo() {
-    const state = redoStack[redoStack.length -1];
-    deserialize(state)
-    undoStack.push(state)
-    redoStack.pop();
-}
-
-undoBtn.addEventListener('click', undo)
-redoBtn.addEventListener('click', redo)
+undoBtn.addEventListener('click', UndoRedo.undo)
+redoBtn.addEventListener('click', UndoRedo.redo)
