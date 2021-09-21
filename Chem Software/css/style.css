@@ -22,20 +22,28 @@ nav{
     position: relative;
     height: 80px;
     width: 80px;
-    border: 2px solid #0d8dd6;
+    border: 3px solid #00bdb3;
     overflow: hidden;
     border-radius: 50%;
 }
 
 #logo img{
     position: absolute;
-    width: 98%;
+    width: 150%;
     border-radius: 50%;
-    height: 98%;
+    height: 150%;
     margin: 2%;
-    top: 48%;
-    left: 48%;
+    top: 58%;
+    left: 50%;
     transform: translate(-50%, -50%);
+}
+
+nav label{
+    width: 100%;
+    cursor: pointer;
+}
+input#open{
+    display: none;
 }
 
 li.nav-item.dropdown {
@@ -58,11 +66,11 @@ li.nav-item.dropdown {
     height: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-content: center;
     justify-content: center;
     align-items: center;
-    background: rgb(86,81,159);
-    background: linear-gradient(184deg, rgba(86,81,159,1) 22%, rgba(113,113,255,1) 65%, rgba(60,108,249,0.6786064767703957) 100%);
+    /*background: linear-gradient(184deg, rgba(86,81,159,1) 22%, rgba(113,113,255,1) 65%, rgba(60,108,249,0.6786064767703957) 100%);*/
+    /* background: linear-gradient(184deg, rgb(59 0 63 / 58%) 22%, rgba(113,113,255,1) 65%, rgba(60,108,249,0.6786064767703957) 100%); */
+    background: linear-gradient( 70deg, #00bdb3 50%, #193937de 100%);
     overflow: auto;
 }
 
@@ -74,7 +82,8 @@ button.tool {
 }
 
 button.tool:hover, button.tool.active{
-    background-color: #a6bbdb7a;
+    background-color: rgb(0 0 0 / 13%);
+    border-radius: 10%;
 }
 
 button.toolbar img{
@@ -95,47 +104,53 @@ button.toolbar img{
 
 .text-toolbar {
     height: 100%;
-    width: 35px;
+    width: auto;
+    padding: 15px;
+    display: flex;
     overflow: hidden;
     position: relative;
     background: #e7ebee;
-    -webkit-transition: all 0.5s 0s ease;
-    -moz-transition: all 0.5s 0s ease;
-    -o-transition: all 0.5s 0s ease;
-    transition: all 0.5s 0s ease;
+    background: linear-gradient( 70deg, #00bdb3 50%, #193937de 100%);
 }
 
-.text-toolbar.open{
-    width: 350px;
+.text-icons {
+    height: 100%;
+    width: 50px;
+    display: flex;
+    align-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
 }
 
-.text-toolbar .arrow-container{
+.text-icons button img{
     position: absolute;
-    top: 2px;
-    left: 2px;
-    transform: rotate(180deg);
-    -webkit-transition: all 0.5s 0s ease;
-    -moz-transition: all 0.5s 0s ease;
-    -o-transition: all 0.5s 0s ease;
-    transition: all 0.5s 0s ease;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
 }
 
-.text-toolbar .arrow-container.open{
-    transform: rotate(0deg);
+.text-icons button{
+    background: transparent;
+    width: 38px;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
 }
 
 div#text-wrapper {
     font-family: 'Times New Roman', Times, serif;
     height: 100%;
-    width: 100%;
-    overflow: hidden;
-    padding: 15px;
-    margin-top: 15px;
+    width: 0px;
     display: none;
+    overflow: hidden;
     align-content: center;
     flex-wrap: nowrap;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: flex-start;
     -webkit-transition: all 0.5s 0s ease;
     -moz-transition: all 0.5s 0s ease;
@@ -145,6 +160,24 @@ div#text-wrapper {
 
 div#text-wrapper.open{
     display: flex;
+    width: 350px;
+    margin-left: 12px;
+}
+
+div#text-wrapper div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    font-weight: 800;
+    line-height: .8;
+}
+
+input {
+    background: transparent;
+    border: navajowhite;
 }
 
 .form-select{
@@ -158,6 +191,22 @@ div#text-controls-additional {
     justify-content: space-between;
     align-items: center;
 }
+
+div#text-controls-additional input{
+    opacity: 0;
+}
+
+div#text-controls-additional label{
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+div#text-controls-additional label.selected{
+    background-color: rgb(0 0 0 / 13%);
+}
+
+
 
 #bold{
     font-weight: bold;

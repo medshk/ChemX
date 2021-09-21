@@ -15,7 +15,7 @@
         <div class="container-fluid">
             
             <a id="logo" class="navbar-brand" href="#">
-                <img src="./icons/logo-2.jpg" alt="" srcset="">
+                <img src="./icons/logo-shork.png" alt="" srcset="">
             </a>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -26,8 +26,8 @@
                             New
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><button class="dropdown-item">New Document (open new tab)</button></li>
-                            <li><button class="dropdown-item">New Document (open in current tab)</button></li>
+                            <li><button class="dropdown-item" id="newTab">New Document (open in new tab)</button></li>
+                            <li><button class="dropdown-item" id="currentTab">New Document (open in current tab)</button></li>
                         </ul>
                     </li>
 
@@ -36,13 +36,13 @@
                             Document
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><button class="dropdown-item">Clear</button></li>
-                            <li><button class="dropdown-item">Is Blank</button></li>
+                            <li><button class="dropdown-item" id="clear">Clear</button></li>
+                            <li><button class="dropdown-item" id="isBlank">Is Blank</button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item">Open</button></li>
+                            <li><button class="dropdown-item"><label for="open">Open</label> <input id="open" type="file" accept=".cmk"></button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item">Save</button></li>
-                            <li><button class="dropdown-item">Save As</button></li> 
+                            <li><button class="dropdown-item" id="save">Save File</button></li>
+                            <li><button class="dropdown-item" id="saveAs">Save As PNG</button></li> 
                         </ul>
                     </li>
 
@@ -54,11 +54,11 @@
                             <li><button class="dropdown-item" id="undo">Undo</button></li>
                             <li><button class="dropdown-item" id="redo">Redo</button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item">Copy</button></li>
-                            <li><button class="dropdown-item">Paste</button></li>
-                            <li><button class="dropdown-item">Cut</button></li>
+                            <li><button class="dropdown-item" id="copy">Copy</button></li>
+                            <li><button class="dropdown-item" id="paste">Paste</button></li>
+                            <li><button class="dropdown-item" id="cut">Cut</button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item">Select All</button></li>
+                            <li><button class="dropdown-item" id="select-all">Select All</button></li>
                         </ul>
                     </li>
 
@@ -74,6 +74,18 @@
                             <li><button class="dropdown-item">Rotate Left</button></li>
                             <li><button class="dropdown-item">Rotate Right</button></li>
                             <li><button class="dropdown-item">Rotate 180°</button></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Structures
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><button class="dropdown-item structure" data-name="vitamin-c.cmk">Vitamin C</button></li>
+                            <li><button class="dropdown-item structure" data-name="caffeine.cmk">Caffeine</button></li>
+                            <li><button class="dropdown-item structure" data-name="lycopodine.cmk">Lycopodine</button></li>
+                            <li><button class="dropdown-item structure" data-name="dimethylstillboestrol.cmk">Diméthylstillboestrol</button></li>
                         </ul>
                     </li>
 
@@ -100,12 +112,12 @@
             <button class="tool" data-name="polygone" data-type="pentane"><img src="./icons/structures/pentane.png" alt="" ></button>
             <button class="tool" data-name="polygone" data-type="propane"><img src="./icons/structures/propane.png" alt="" ></button>
     
-            <button class="tool"><img src="./icons/others/plus.png" alt="" ></button>
-            <button class="tool"><img src="./icons/others/circle-plus.png" alt="" ></button>
-            <button class="tool"><img src="./icons/others/minus.png" alt="" ></button>
-            <button class="tool"><img src="./icons/others/circle-minus.png" alt="" ></button>
+            <button class="tool" data-name="symbol" data-type="plus"><img src="./icons/others/plus.png" alt="" ></button>
+            <button class="tool" data-name="symbol" data-type="circle-plus"><img src="./icons/others/circle-plus.png" alt="" ></button>
+            <button class="tool" data-name="symbol" data-type="minus"><img src="./icons/others/minus.png" alt="" ></button>
+            <button class="tool" data-name="symbol" data-type="circle-minus"><img src="./icons/others/circle-minus.png" alt="" ></button>
             <button class="tool" data-name="arrow" data-type=""><img src="./icons/others/arrow.png" alt="" ></button>
-            <button class="tool"><img src="./icons/others/eraser.png" alt="" ></button>
+            <button class="tool" data-name="eraser" data-type=""><img src="./icons/others/eraser.png" alt="" ></button>
             <button class="tool active" data-name="text" data-type=""><img src="./icons/others/text.png" alt="" ></button>
             <button class="tool" data-name="selection" data-type=""><img src="./icons/others/selection.png" alt="" ></button>
         </div>
@@ -115,18 +127,46 @@
 
         
         <div class="text-toolbar">
-            <div class="arrow-container">
-                <button id="text-toolbar-arrow">
-                    <img src="./icons/others/arrow.svg" alt="arrow icon">
+            <div class="text-icons">
+                <button>
+                    <img src="./icons/text/svgtopng/font-color.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/font-family2.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/text-align.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/bg-color.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/text-bg.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/stroke-color.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/stroke.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/font-size.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/line-height.png">
+                </button>
+                <button>
+                    <img src="./icons/text/svgtopng/text-decoration.png">
                 </button>
             </div>
             <div id="text-wrapper" ng-show="getText()">
                 <div>
-                    <label for="text-color" class="form-label">Font Color: </label>
+                    <label for="text-color" class="form-label">Font Color</label>
                     <input type="color" class="form-control-color" id="text-color" value="#000000" title="Choose your color">
                 </div>
                 <div>
-                    <label for="font-family">Font family:</label>
+                    
+                    <label for="font-family">Font family</label>
                     <select id="font-family" class="form-select">
                         <option value="times new roman" selected>Times New Roman</option>
                         <option value="arial">Arial</option>
@@ -144,7 +184,7 @@
                     </select>
                 </div>
                 <div>
-                    <label for="text-align">Text align:</label>
+                    <label for="text-align">Text align</label>
                     <select id="text-align" class="form-select">
                         <option value="left">Left</option>
                         <option value="center">Center</option>
@@ -153,27 +193,27 @@
                     </select>
                 </div>
                 <div>
-                    <label for="text-bg-color" class="form-label">Background color: </label>
+                    <label for="text-bg-color" class="form-label">Background color</label>
                     <input type="color" class="form-control-color" id="text-bg-color" value="#ffffff" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-lines-bg-color" class="form-label">Background text color: </label>
+                    <label for="text-lines-bg-color" class="form-label">Text background color</label>
                     <input type="color" class="form-control-color" id="text-lines-bg-color" value="#ffffff" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-stroke-color" class="form-label">Stroke color: </label>
+                    <label for="text-stroke-color" class="form-label">Stroke color</label>
                     <input type="color" class="form-control-color" id="text-stroke-color" value="#000000" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-stroke-width" class="form-label">Stroke width: </label>
+                    <label for="text-stroke-width" class="form-label">Stroke width</label>
                     <input type="range" class="form-range" value="4" min="0" max="20" step="2" id="text-stroke-width">
                 </div>
                 <div>
-                    <label for="text-font-size" class="form-label">Font size: </label>
+                    <label for="text-font-size" class="form-label">Font size</label>
                     <input type="range" class="form-range" value="42" min="1" max="120" step="2" id="text-font-size">
                 </div>
                 <div>
-                    <label for="text-line-height" class="form-label">Line height: </label>
+                    <label for="text-line-height" class="form-label">Line height</label>
                     <input type="range" class="form-range" value="1" min="1" max="10" step="1" id="text-line-height">
                 </div>
                 <div id="text-controls-additional">
@@ -210,7 +250,7 @@
 
     <script src="./js/bootstrap.min.js"></script>
     <script src="./js/fabric.min.js"></script>
-    <!-- <script src="./js/main.js"></script> -->
+    <script src="./js/FileSaver.js"></script>
     <script src="./js/app.js"></script>
 </body>
 </html>

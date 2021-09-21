@@ -1,3 +1,6 @@
+           
+            const attributes = ['id', 'name', 'stroke', 'strokeWidth', 'originX', 'originY', 'angle', 'hasControls', 'hasBorders', 'selectable', 'lineId', 'radius', 'polygId', 'originCenter', 'center', 'line', 'originCenter', 'strokeDashArray', 'evented', 'fontSize', 'textBackgroundColor', 'padding', 'opacity', 'lineAngle', ]
+
 var canvas = new fabric.Canvas('canvas');
 canvas.setDimensions({width: 1500, height: 600});
 
