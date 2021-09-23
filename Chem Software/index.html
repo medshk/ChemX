@@ -4,13 +4,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>molecule editor</title>
+    <title>chemX</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="shortcut icon" type="image/jpg" href="./icons/cyclopentadiene.png"/>
+    <link rel="icon" href="./icons/logo-2.jpg">
     <!-- <link href='https://fonts.googleapis.com/css?family=Poppins|Roboto|Oswald|Arial|Lobster|Pacifico|Satisfy|Bangers|Audiowide|Sacramento' rel='stylesheet' type='text/css'> -->
 </head>
 <body>
+    <div class="loader-container">
+        <div class="name-container">
+            <p id="name">chem<span>X</span></p>
+            <p id="loading">LOADING...</p>
+        </div>
+        <div class="loader">
+            <ul class="hexagon-container">
+              <li class="hexagon hex_1"></li>
+              <li class="hexagon hex_2"></li>
+              <li class="hexagon hex_3"></li>
+              <li class="hexagon hex_4"></li>
+              <li class="hexagon hex_5"></li>
+              <li class="hexagon hex_6"></li>
+              <li class="hexagon hex_7"></li>
+            </ul>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             
@@ -39,7 +57,7 @@
                             <li><button class="dropdown-item" id="clear">Clear</button></li>
                             <li><button class="dropdown-item" id="isBlank">Is Blank</button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item"><label for="open">Open</label> <input id="open" type="file" accept=".cmk"></button></li>
+                            <li><button class="dropdown-item"><label for="open">Open</label> <input id="open" type="file" accept=".cmx"></button></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><button class="dropdown-item" id="save">Save File</button></li>
                             <li><button class="dropdown-item" id="saveAs">Save As PNG</button></li> 
@@ -67,13 +85,13 @@
                             Object
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><button class="dropdown-item">Align Left</button></li>
-                            <li><button class="dropdown-item">Align Right</button></li>
-                            <li><button class="dropdown-item">Align Center</button></li>
+                            <li><button class="dropdown-item" id="align-left">Align Left</button></li>
+                            <li><button class="dropdown-item" id="align-right">Align Right</button></li>
+                            <li><button class="dropdown-item" id="align-center">Align Center</button></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><button class="dropdown-item">Rotate Left</button></li>
-                            <li><button class="dropdown-item">Rotate Right</button></li>
-                            <li><button class="dropdown-item">Rotate 180°</button></li>
+                            <li><button class="dropdown-item" id="rotate-left">Rotate Left</button></li>
+                            <li><button class="dropdown-item" id="rotate-right">Rotate Right</button></li>
+                            <li><button class="dropdown-item" id="rotate-180">Rotate 180°</button></li>
                         </ul>
                     </li>
 
@@ -82,10 +100,10 @@
                             Structures
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><button class="dropdown-item structure" data-name="vitamin-c.cmk">Vitamin C</button></li>
-                            <li><button class="dropdown-item structure" data-name="caffeine.cmk">Caffeine</button></li>
-                            <li><button class="dropdown-item structure" data-name="lycopodine.cmk">Lycopodine</button></li>
-                            <li><button class="dropdown-item structure" data-name="dimethylstillboestrol.cmk">Diméthylstillboestrol</button></li>
+                            <li><button class="dropdown-item structure" data-name="vitamin-c.cmx">Vitamin C</button></li>
+                            <li><button class="dropdown-item structure" data-name="caffeine.cmx">Caffeine</button></li>
+                            <li><button class="dropdown-item structure" data-name="lycopodine.cmx">Lycopodine</button></li>
+                            <li><button class="dropdown-item structure" data-name="dimethylstillboestrol.cmx">Diméthylstillboestrol</button></li>
                         </ul>
                     </li>
 
@@ -166,7 +184,7 @@
                 </div>
                 <div>
                     
-                    <label for="font-family">Font family</label>
+                    <label for="font-family">Font Family</label>
                     <select id="font-family" class="form-select">
                         <option value="times new roman" selected>Times New Roman</option>
                         <option value="arial">Arial</option>
@@ -184,7 +202,7 @@
                     </select>
                 </div>
                 <div>
-                    <label for="text-align">Text align</label>
+                    <label for="text-align">Text Align</label>
                     <select id="text-align" class="form-select">
                         <option value="left">Left</option>
                         <option value="center">Center</option>
@@ -193,27 +211,27 @@
                     </select>
                 </div>
                 <div>
-                    <label for="text-bg-color" class="form-label">Background color</label>
+                    <label for="text-bg-color" class="form-label">Background Color</label>
                     <input type="color" class="form-control-color" id="text-bg-color" value="#ffffff" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-lines-bg-color" class="form-label">Text background color</label>
+                    <label for="text-lines-bg-color" class="form-label">Text Background Color</label>
                     <input type="color" class="form-control-color" id="text-lines-bg-color" value="#ffffff" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-stroke-color" class="form-label">Stroke color</label>
+                    <label for="text-stroke-color" class="form-label">Stroke Color</label>
                     <input type="color" class="form-control-color" id="text-stroke-color" value="#000000" title="Choose your color">
                 </div>
                 <div>
-                    <label for="text-stroke-width" class="form-label">Stroke width</label>
+                    <label for="text-stroke-width" class="form-label">Stroke Width</label>
                     <input type="range" class="form-range" value="4" min="0" max="20" step="2" id="text-stroke-width">
                 </div>
                 <div>
-                    <label for="text-font-size" class="form-label">Font size</label>
+                    <label for="text-font-size" class="form-label">Font Size</label>
                     <input type="range" class="form-range" value="42" min="1" max="120" step="2" id="text-font-size">
                 </div>
                 <div>
-                    <label for="text-line-height" class="form-label">Line height</label>
+                    <label for="text-line-height" class="form-label">Line Height</label>
                     <input type="range" class="form-range" value="1" min="1" max="10" step="1" id="text-line-height">
                 </div>
                 <div id="text-controls-additional">

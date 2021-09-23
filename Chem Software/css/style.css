@@ -1,9 +1,217 @@
-@import url('https://fonts.googleapis.com/css?family=Pacifico|VT323|Quicksand|Inconsolata|Tangerine|Palette Mosaic|MonteCarlo');
+@import url('https://fonts.googleapis.com/css?family=Pacifico|VT323|Quicksand|Inconsolata|Tangerine|Palette Mosaic|MonteCarlo|Lobster');
 *{
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
+
+
+
+/* loading page */
+.loader-container{
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    background: white;
+}
+.name-container{
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+}
+.name-container #name {
+    font-size: 4rem;
+    background: linear-gradient( 2deg, #0c0c0cb8 38%, #00ffdc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Lobster', cursive;
+}
+
+.name-container #loading {
+    margin: auto;
+    width: fit-content;
+    position: absolute;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .8rem;
+    font-weight: 500;
+    color: #00827b;
+}
+
+.loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 160px;
+    height: 160px;
+    margin: -80px 0px 0px -80px;
+    background-color: transparent;
+    border-radius: 50%;
+    border: 2px solid #e3e4dc;
+}
+.loader:before {
+    content: '';
+    width: 164px;
+    height: 164px;
+    display: block;
+    position: absolute;
+    border: 2px solid #00bdb3;
+    border-radius: 50%;
+    top: -2px;
+    left: -2px;
+    box-sizing: border-box;
+    clip: rect(0px, 35px, 35px, 0px);
+    z-index: 10;
+    animation: rotate infinite;
+    animation-duration: 3s;
+    animation-timing-function: linear;
+}
+.loader:after {
+    content: '';
+    width: 164px;
+    height: 164px;
+    display: block;
+    position: absolute;
+    border: 2px solid #00bdb3;
+    border-radius: 50%;
+    top: -2px;
+    left: -2px;
+    box-sizing: border-box;
+    clip: rect(0px, 164px, 150px, 0px);
+    z-index: 9;
+    animation: rotate2 3s linear infinite;
+}
+.hexagon-container {
+    position: relative;
+    top: 33px;
+    left: 41px;
+    border-radius: 50%;
+}
+.hexagon {
+    position: absolute;
+    width: 40px;
+    height: 23px;
+    background: #00bdb3;
+}
+.hexagon:before {
+    content: "";
+    position: absolute;
+    top: -11px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 11.5px solid #00bdb3;
+}
+.hexagon:after {
+    content: "";
+    position: absolute;
+    top: 23px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 11.5px solid #00bdb3;
+}
+.hexagon.hex_1 {
+    top: 0px;
+    left: 0px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 0.2142857143s;
+}
+.hexagon.hex_2 {
+    top: 0px;
+    left: 42px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 0.4285714286s;
+}
+.hexagon.hex_3 {
+    top: 36px;
+    left: 63px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 0.6428571429s;
+}
+.hexagon.hex_4 {
+    top: 72px;
+    left: 42px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 0.8571428571s;
+}
+.hexagon.hex_5 {
+    top: 72px;
+    left: 0px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 1.0714285714s;
+}
+.hexagon.hex_6 {
+    top: 36px;
+    left: -21px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 1.2857142857s;
+}
+.hexagon.hex_7 {
+    top: 36px;
+    left: 21px;
+    animation: Animasearch 3s ease-in-out infinite;
+    animation-delay: 1.5s;
+}
+@keyframes Animasearch {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+   }
+    15%, 50% {
+        transform: scale(0.5);
+        opacity: 0;
+   }
+    65% {
+        transform: scale(1);
+        opacity: 1;
+   }
+}
+@keyframes rotate {
+    0% {
+        transform: rotate(0);
+        clip: rect(0px, 35px, 35px, 0px);
+   }
+    50% {
+        clip: rect(0px, 40px, 40px, 0px);
+   }
+    100% {
+        transform: rotate(360deg);
+        clip: rect(0px, 35px, 35px, 0px);
+   }
+}
+@keyframes rotate2 {
+    0% {
+        transform: rotate(0deg);
+        clip: rect(0px, 164px, 150px, 0px);
+   }
+    50% {
+        clip: rect(0px, 164px, 0px, 0px);
+        transform: rotate(360deg);
+   }
+    100% {
+        transform: rotate(720deg);
+        clip: rect(0px, 164px, 150px, 0px);
+   }
+}
+@keyframes rotate3 {
+    0% {
+        transform: rotate(0deg);
+   }
+    100% {
+        transform: rotate(360deg);
+   }
+}
+
+
+
+
 
 body{
     overflow: hidden;
@@ -15,6 +223,10 @@ body button{
 
 nav{
     margin-bottom: 20px;
+}
+
+ul li {
+    list-style: none;
 }
 
 #logo{
@@ -72,6 +284,7 @@ li.nav-item.dropdown {
     /* background: linear-gradient(184deg, rgb(59 0 63 / 58%) 22%, rgba(113,113,255,1) 65%, rgba(60,108,249,0.6786064767703957) 100%); */
     background: linear-gradient( 70deg, #00bdb3 50%, #193937de 100%);
     overflow: auto;
+    
 }
 
 button.tool {
@@ -109,8 +322,8 @@ button.toolbar img{
     display: flex;
     overflow: hidden;
     position: relative;
-    background: #e7ebee;
     background: linear-gradient( 70deg, #00bdb3 50%, #193937de 100%);
+
 }
 
 .text-icons {
@@ -145,21 +358,21 @@ div#text-wrapper {
     font-family: 'Times New Roman', Times, serif;
     height: 100%;
     width: 0px;
-    display: none;
+    margin-left: 0px;
+    display: flex;
     overflow: hidden;
     align-content: center;
     flex-wrap: nowrap;
     flex-direction: column;
     justify-content: space-around;
     align-items: flex-start;
-    -webkit-transition: all 0.5s 0s ease;
-    -moz-transition: all 0.5s 0s ease;
-    -o-transition: all 0.5s 0s ease;
-    transition: all 0.5s 0s ease;
+    -webkit-transition: all 1s 0s ease;
+    -moz-transition: all 1s 0s ease;
+    -o-transition: all 1s 0s ease;
+    transition: all 1s ease;
 }
 
 div#text-wrapper.open{
-    display: flex;
     width: 350px;
     margin-left: 12px;
 }

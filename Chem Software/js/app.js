@@ -1153,6 +1153,7 @@ class Eraser{
     }
     erase(){
         if(this.object.name == "side"){
+            console.log(this.object)
             const line = this.object.line;
             const circle1 = line.circles[0]
             const circle2 = line.circles[1]
@@ -1193,8 +1194,9 @@ class Symbol{
         this.symbol = symbol //the symbol itself
     }
     draw(){
-        console.log(this.object, this.symbol)
-        canvas.add(this.symbol).requestRenderAll()
+        if(this.object.name == "atom_name" || this.object.name == "circle"){
+            canvas.add(this.symbol).requestRenderAll()
+        }
     }
 }
 
@@ -1423,7 +1425,7 @@ class Document{
         const url = URL.createObjectURL( blob );
         var link = document.createElement( 'a' );
         link.setAttribute( 'href', url );
-        link.setAttribute( 'download', 'project.cmk' );
+        link.setAttribute( 'download', 'project.cmx' );
         
         var event = document.createEvent( 'MouseEvents' );
         event.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
@@ -1492,28 +1494,70 @@ class Document{
 //class Edit
 class Edit{
     static clipboard = null;
-    static copy(){
-        /* const selectedObj = canvas.getActiveObject()
-        Edit.object = selectedObj.clone()
-        console.log(Edit.object, selectedObj) */
-        canvas.getActiveObject().clone(function(cloned) {
-            Edit.clipboard = cloned;
-            console.log(cloned)
-        }, UndoRedo.attributes);
-        //console.log(Edit.clipboard)
+    static clonedObjects = []
+    static copy(cut = false){
+        if(canvas.getActiveObject.type == "group"){
+            let group = canvas.getActiveObject();
+            let clonedGroup = null
+            const objects = group._objects;
+    
+            if(cut){
+                canvas.remove(canvas.getActiveObject())
+            }
+            //clone the group
+            group.clone(function(cloned) {
+                clonedGroup = cloned;
+            }, UndoRedo.attributes);
+            //clone froup objects
+            objects.forEach(o => {
+                o.clone(function(cloned) {
+                    Edit.clonedObjects.push(cloned);
+                }, UndoRedo.attributes);
+            })
+            clonedGroup._objects = Edit.clonedObjects;
+            Edit.clipboard = clonedGroup;
+        }else{
+            let object = canvas.getActiveObject();
+            //clone the object
+            object.clone(function(cloned) {
+                Edit.clipboard = cloned;
+            }, UndoRedo.attributes);
+            
+        }
     }
     static paste() {
         // clone again, so you can do multiple copies.
+        /*console.log(Edit.clipboard)
+        Edit.clipboard.set({
+            left: Edit.clipboard.left + 100,
+            top: Edit.clipboard.top + 100,
+            evented: true,
+        });
+        canvas.add(Edit.clipboard).requestRenderAll()
+        Canvas.upgradeId(Edit.clipboard) */
+        //Canvas.ungroup()
+
+        //if the cloned object is a group
+        if(Edit.clonedObjects.length !== 0){
+            Edit.clonedObjects.forEach((o, index)=> {
+                o.clone(function(cloned) {
+                    Edit.clonedObjects[index] = cloned;
+                }, UndoRedo.attributes);
+            })
+        }
         Edit.clipboard.clone(function(clonedObj) {
+            console.log(clonedObj)
             canvas.discardActiveObject();
             clonedObj.set({
                 left: clonedObj.left + 10,
                 top: clonedObj.top + 10,
                 evented: true,
-            }, UndoRedo.attributes);
+            });
             if (clonedObj.type === 'activeSelection') {
                 // active selection needs a reference to the canvas.
                 clonedObj.canvas = canvas;
+                clonedObj._objects = Edit.clonedObjects
+                
                 clonedObj.forEachObject(function(obj) {
                     canvas.add(obj);
                 });
@@ -1525,12 +1569,83 @@ class Edit{
             Edit.clipboard.top += 10;
             Edit.clipboard.left += 10;
             canvas.setActiveObject(clonedObj);
-            console.log(clonedObj)
             canvas.requestRenderAll();
-        });
+            if(clonedObj.type === "group"){
+                Canvas.upgradeId(clonedObj)
+            }
+        }, UndoRedo.attributes);
+
+        UndoRedo.saveState()
+    }
+    static cut(){
+        Edit.copy(true)
+
+        UndoRedo.saveState()
+    }
+    static selectAll(){
+        const group = new fabric.Group(canvas.getObjects(),{
+            originX: "center",
+            originY: "center"
+        })
+        canvas.clear()
+        canvas.add(group)
+        canvas.setActiveObject(group)
+        canvas.requestRenderAll()
     }
 }
 
+//class Object
+class Obj{
+    static alignLeft(){
+        const object = canvas.getActiveObject()
+        object.set({
+            left: object.width/2
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+    static alignRight(){
+        const object = canvas.getActiveObject()
+        object.set({
+            left: 1223 - object.width/2 // 1223 is the canvas width
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+    static alignCenter(){
+        const object = canvas.getActiveObject()
+        object.set({
+            left: 1223/2 // 1223 is the canvas width
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+
+    static rotateLeft(){
+        const object = canvas.getActiveObject()
+        object.set({
+            angle: object.angle - 45
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+    static rotateRight(){
+        const object = canvas.getActiveObject()
+        object.set({
+            angle: object.angle + 45
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+    static rotate180(){
+        const object = canvas.getActiveObject()
+        object.set({
+            angle: object.angle + 180
+        })
+        canvas.requestRenderAll()
+        UndoRedo.saveState()
+    }
+}
 
 class Structures{
     static open(file){
@@ -1715,6 +1830,29 @@ class Canvas{
             //UndoRedo.saveState()
         })
     }
+
+    static upgradeId(object){
+        if(object.type == "group"){
+            const lines = object._objects.filter (l => l.name == "line")
+            lines.forEach(l => {
+                const linesObj = object._objects.filter (o => o.lineId == l.lineId) 
+                linesObj.forEach(o => {
+                    if(o.lineId){
+                        o.lineId = Canvas.lineId ;
+                    }
+                    /* if(o.polygId){
+                        o.polygId = Polygone.polygId;
+                    } */
+                    //if(o.id) Polygone.polygId += 1;
+                })
+                Canvas.lineId ++
+            })
+        }else{
+            if(o.lineId) Canvas.lineId += 1;
+            if(o.polygId) Polygone.polygId += 1;
+            if(o.id) Polygone.polygId += 1;
+        }
+    }
 }
 
 //Toolbar class:
@@ -1855,8 +1993,21 @@ class Toolbar{
             if (canvas.getActiveObject().type !== 'activeSelection') {
             return;
             }
-        
-            canvas.getActiveObject().toGroup();
+            
+            //group the selection and set the origins to center
+            canvas.getActiveObject().toGroup().set({
+                left: canvas.getActiveObject().left + canvas.getActiveObject().width/2, 
+                top: canvas.getActiveObject().top + canvas.getActiveObject().height/2, 
+                originX: "center",
+                originY: "center",
+
+            });
+            console.log(canvas.getActiveObject())
+            /* const group = new fabric.Group(canvas.getActiveObject()._objects,{
+                originX: "center",
+                originY: "center",
+            }) */
+            //canvas.setActiveObject(group)
             canvas.requestRenderAll();
         })  
 
@@ -1867,6 +2018,7 @@ class Toolbar{
                 return;
             }
             Canvas.ungroup()
+            UndoRedo.updateObjects()
         })
     }
 
@@ -1897,7 +2049,11 @@ class Toolbar{
 
 
 ////////////////////// MAIN //////////////////////
-
+window.addEventListener('load', function(event) {
+    setTimeout(() => {
+        document.querySelector('.loader-container').style.display = "none"
+    }, 2000);
+});
 
 //set the fabric canvas
 const canvas = new fabric.Canvas('canvas');
@@ -2044,7 +2200,6 @@ document.querySelectorAll('.tool').forEach(tool => {
 //Text editor events
 //show the toolbar
 document.querySelector('.text-icons').addEventListener('click', (e)=>{
-    document.querySelector('.text-toolbar').classList.toggle("open");
     document.querySelector('#text-wrapper').classList.toggle("open");
 })
 
@@ -2251,6 +2406,17 @@ document.getElementById('isBlank').addEventListener('click', Document.isBlank)
 //Edit
 document.getElementById('copy').addEventListener('click', Edit.copy)
 document.getElementById('paste').addEventListener('click', Edit.paste)
+document.getElementById('cut').addEventListener('click', Edit.cut)
+document.getElementById('select-all').addEventListener('click', Edit.selectAll)
+
+//Object//
+document.getElementById('align-left').addEventListener('click', Obj.alignLeft)
+document.getElementById('align-right').addEventListener('click', Obj.alignRight)
+document.getElementById('align-center').addEventListener('click', Obj.alignCenter)
+document.getElementById('rotate-left').addEventListener('click', Obj.rotateLeft)
+document.getElementById('rotate-right').addEventListener('click', Obj.rotateRight)
+document.getElementById('rotate-180').addEventListener('click', Obj.rotate180)
+
 
 //////////structures//////////
 const structures = document.querySelectorAll('.structure')
@@ -2266,7 +2432,30 @@ document.addEventListener('keydown', function(e){
     }
     else if (e.ctrlKey && e.key === 'z') {
         UndoRedo.undo();
+
     }else if (e.ctrlKey && e.code === 'Space') {
         Document.clear();
+
+    }else if (e.ctrlKey && e.key === 's') {
+        e.preventDefault()
+        Document.save();
+
+    }else if (e.ctrlKey && e.key === 'o') {
+        e.preventDefault()
+        document.querySelector("label[for='open']").click()
+
+    }else if (e.ctrlKey && e.key === 'a') {
+        e.preventDefault()
+        Edit.selectAll();
+
+    }else if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault()
+        document.querySelector("#newTab").click()
+
+    }else if (e.code === 'Delete') {
+        e.preventDefault()
+        if(canvas.getActiveObject()){
+            return new Eraser(canvas.getActiveObject())
+        }
     }
 })
