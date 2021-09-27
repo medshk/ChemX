@@ -1494,16 +1494,13 @@ class Document{
 //class Edit
 class Edit{
     static clipboard = null;
-    static clonedObjects = []
-    static copy(cut = false){
+    static clonedObjects = [];
+
+    static copy(){
         if(canvas.getActiveObject.type == "group"){
             let group = canvas.getActiveObject();
             let clonedGroup = null
             const objects = group._objects;
-    
-            if(cut){
-                canvas.remove(canvas.getActiveObject())
-            }
             //clone the group
             group.clone(function(cloned) {
                 clonedGroup = cloned;
@@ -1546,7 +1543,6 @@ class Edit{
             })
         }
         Edit.clipboard.clone(function(clonedObj) {
-            console.log(clonedObj)
             canvas.discardActiveObject();
             clonedObj.set({
                 left: clonedObj.left + 10,
@@ -1579,7 +1575,7 @@ class Edit{
     }
     static cut(){
         Edit.copy(true)
-
+        canvas.remove(canvas.getActiveObject()).requestRenderAll()
         UndoRedo.saveState()
     }
     static selectAll(){
@@ -2404,9 +2400,13 @@ document.getElementById('clear').addEventListener('click', Document.clear)
 document.getElementById('isBlank').addEventListener('click', Document.isBlank)
 
 //Edit
-document.getElementById('copy').addEventListener('click', Edit.copy)
+document.getElementById('copy').addEventListener('click', function(){
+    Edit.copy()
+})
 document.getElementById('paste').addEventListener('click', Edit.paste)
-document.getElementById('cut').addEventListener('click', Edit.cut)
+document.getElementById('cut').addEventListener('click', function(){
+    Edit.cut()
+})
 document.getElementById('select-all').addEventListener('click', Edit.selectAll)
 
 //Object//
@@ -2444,6 +2444,18 @@ document.addEventListener('keydown', function(e){
         e.preventDefault()
         document.querySelector("label[for='open']").click()
 
+    }else if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault()
+        Edit.copy()
+
+    }else if (e.ctrlKey && e.key === 'v') {
+        e.preventDefault()
+        Edit.paste()
+
+    }else if (e.ctrlKey && e.key === 'x') {
+        e.preventDefault()
+        Edit.cut()
+        console.log("x")
     }else if (e.ctrlKey && e.key === 'a') {
         e.preventDefault()
         Edit.selectAll();
